@@ -51,3 +51,12 @@
       (recur (inc i) (next r))
       i)))
 
+(defn reverse-sequence
+  "反转队列"
+  [coll]
+  (loop [i (count coll) tmp-coll coll r '()]
+    (if (first tmp-coll)
+      (recur (dec i) (rest tmp-coll) (conj r (first tmp-coll)))
+      r)))
+
+
