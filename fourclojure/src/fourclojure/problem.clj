@@ -86,8 +86,31 @@
     (map fibonacci ir)))
 
 (defn palindrome?
-  "监测一个序列是否是回文结构"
+  "监测一个序列是否是回文结构
+  #(= (vec %) (reverse %))"
   [coll]
   (if (string? coll)
     (= (apply str (reverse coll)) coll)
     (= (reverse coll) coll)))
+
+(defn max-val
+  "求序列中最大值
+  简洁答案：#(last (sort %&))"
+  [& coll]
+  (let [tmp-max-fn (fn [tmp-max val]
+                    (if (> val tmp-max)
+                      val
+                      tmp-max))]
+    (loop [i (count coll) tmp-max (first coll) r coll]
+      (if (= 1 i)
+        tmp-max
+        (recur (dec i) (tmp-max-fn tmp-max (first r)) (rest r))))))
+
+(defn caps
+  "取大写字母
+  #(.replaceAll % \"[^A-Z]\" \"\")"
+  [chars]
+  (let [upper-letter #{\A \B \C \D \E \F \G \H \I \J \K \L \M \N \O \P \Q
+                       \R \S \T \U \V \W \X \Y \Z}]
+    (->> (filter #(contains? upper-letter %) (vec chars))
+         (apply str))))

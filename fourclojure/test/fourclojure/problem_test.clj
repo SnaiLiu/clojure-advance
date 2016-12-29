@@ -62,6 +62,14 @@
   (is (true? (palindrome? "racecar")))
   (is (true? (palindrome? [:foo :bar :foo])))
   (is (true? (palindrome? '(1 1 3 3 1 1))))
-  (is (false? (palindrome? '(:a :b :c))))
+  (is (false? (palindrome? '(:a :b :c)))))
 
-                     )
+(deftest ﻿maximum-value-38
+  (is (= (max-val 1 8 3 4) 8))
+  (is (= (max-val 30 20 40) 30))
+  (is (= (max-val 45 67 11) 67)))
+
+(deftest ﻿Get-the-Caps-29
+  (is (= (caps "HeLlO, WoRlD!") "HLOWRD"))
+  (is (empty? (caps "nothing")))
+  (is (= (caps "$#A(*&987Zf") "AZ")))
