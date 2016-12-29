@@ -63,3 +63,8 @@
   "序列求和"
   [coll]
   (apply + coll))
+
+(defn odd-numbers
+  "找出序列中的所有奇数的数， 没有则返回空序列'()"
+  [coll]
+  (filter odd? coll))

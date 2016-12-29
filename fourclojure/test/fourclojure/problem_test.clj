@@ -45,3 +45,9 @@
   (is (= (sum-up #{4 2 1}) 7))
   (is (= (sum-up '(0 0 -1)) -1))
   (is (= (sum-up '(1 10 3)) 14)))
+
+(deftest odd-numbers-of-a-sequence-25
+  (is (= (odd-numbers #{1 2 3 4 5}) '(1 3 5)))
+  (is (= (odd-numbers [4 2 1 6]) '(1)))
+  (is (= (odd-numbers [2 2 4 6]) '()))
+  (is (= (odd-numbers [1 1 1 3]) '(1 1 1 3))))
