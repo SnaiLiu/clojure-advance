@@ -13,6 +13,11 @@
   (is (= (penultimate1 ["a" "b" "c"]) "b"))
   (is (= (penultimate1 [[1 2] [3 4]]) [1 2])))
 
+(deftest 题目20测试-test2
+  (is (= (penultimate2 (list 1 2 3 4 5)) 4))
+  (is (= (penultimate2 ["a" "b" "c"]) "b"))
+  (is (= (penultimate2 [[1 2] [3 4]]) [1 2])))
+
 (deftest 求是3或5倍数的数之和
   (is (= (sum-multiples-3or5 1000) 233168)))
 

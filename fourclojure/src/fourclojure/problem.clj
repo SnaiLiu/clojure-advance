@@ -7,6 +7,13 @@
     (first coll)
     (last-n-element (rest coll) n)))
 
+(defn last-n-element2
+  [coll n]
+  (loop [i 1 r coll]
+    (if (= n (count r))
+      (first r)
+      (recur (inc i) (rest r)))))
+
 (defn last-element1
   "倒数第一个元素"
   [coll]
@@ -16,6 +23,10 @@
   "倒数第二个元素"
   [coll]
   (last-n-element coll 2))
+
+(defn penultimate2
+  [coll]
+  (last-n-element2 coll 2))
 
 (defn sum-multiples-3or5
   "n以内，3或5的倍数之和"
@@ -31,4 +42,3 @@
     (if (= n i)
       (first r)
       (recur (inc i) (rest r)))))
-
