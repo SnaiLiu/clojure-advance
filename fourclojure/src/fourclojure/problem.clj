@@ -59,4 +59,7 @@
       (recur (dec i) (rest tmp-coll) (conj r (first tmp-coll)))
       r)))
 
-
+(defn sum-up
+  "序列求和"
+  [coll]
+  (apply + coll))

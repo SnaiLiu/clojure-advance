@@ -38,3 +38,10 @@
   (is (= (reverse-sequence [1 2 3 4 5]) [5 4 3 2 1]))
   (is (= (reverse-sequence (sorted-set 5 7 2 7)) '(7 5 2)))
   (is (= (reverse-sequence [[1 2][3 4][5 6]]) [[5 6][3 4][1 2]])))
+
+(deftest sum-it-all-up-24
+  (is (= (sum-up [1 2 3]) 6))
+  (is (= (sum-up (list 0 -2 5 5)) 8))
+  (is (= (sum-up #{4 2 1}) 7))
+  (is (= (sum-up '(0 0 -1)) -1))
+  (is (= (sum-up '(1 10 3)) 14)))
