@@ -51,3 +51,8 @@
   (is (= (odd-numbers [4 2 1 6]) '(1)))
   (is (= (odd-numbers [2 2 4 6]) '()))
   (is (= (odd-numbers [1 1 1 3]) '(1 1 1 3))))
+
+(deftest fibonacci-sequence-26
+  (is (= (fibonacci-sequence 3) '(1 1 2)))
+  (is (= (fibonacci-sequence 6) '(1 1 2 3 5 8)))
+  (is (= (fibonacci-sequence 8) '(1 1 2 3 5 8 13 21))))

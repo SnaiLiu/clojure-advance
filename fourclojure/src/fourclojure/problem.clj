@@ -68,3 +68,19 @@
   "找出序列中的所有奇数的数， 没有则返回空序列'()"
   [coll]
   (filter odd? coll))
+
+;;F(1)=F(2)=1,F(n)=F(n-1)+F(n-2) (n≥3)
+
+
+(defn fibonacci
+  "求斐波那契数"
+  [n]
+  (if (or (= 1 n) (= 2 n))
+    1
+    (+ (fibonacci (dec n)) (fibonacci (- n 2)))))
+
+(defn fibonacci-sequence
+  "求斐波那切数列"
+  [n]
+  (let [ir (range 1 (+ 1 n))]
+    (map fibonacci ir)))
