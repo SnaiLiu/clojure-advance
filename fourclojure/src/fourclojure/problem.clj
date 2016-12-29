@@ -42,3 +42,12 @@
     (if (= n i)
       (first r)
       (recur (inc i) (rest r)))))
+
+(defn count-sequence
+  "获取一个队列的长度"
+  [coll]
+  (loop [i 1 r coll]
+    (if (next r)
+      (recur (inc i) (next r))
+      i)))
+
