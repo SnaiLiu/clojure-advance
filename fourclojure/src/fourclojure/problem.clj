@@ -84,3 +84,10 @@
   [n]
   (let [ir (range 1 (+ 1 n))]
     (map fibonacci ir)))
+
+(defn palindrome?
+  "监测一个序列是否是回文结构"
+  [coll]
+  (if (string? coll)
+    (= (apply str (reverse coll)) coll)
+    (= (reverse coll) coll)))

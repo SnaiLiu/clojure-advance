@@ -56,3 +56,12 @@
   (is (= (fibonacci-sequence 3) '(1 1 2)))
   (is (= (fibonacci-sequence 6) '(1 1 2 3 5 8)))
   (is (= (fibonacci-sequence 8) '(1 1 2 3 5 8 13 21))))
+
+(deftest ﻿palindrome-Detector-27
+  (is (false? (palindrome? '(1 2 3 4 5))))
+  (is (true? (palindrome? "racecar")))
+  (is (true? (palindrome? [:foo :bar :foo])))
+  (is (true? (palindrome? '(1 1 3 3 1 1))))
+  (is (false? (palindrome? '(:a :b :c))))
+
+                     )
