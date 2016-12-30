@@ -173,7 +173,8 @@
   参考答案：#(interleave % %)
   其中，interleave函数，返回各个coll的第一个元素，再第二个元素，再第三个元素..."
   [coll]
-  (->> (map #(do [% %]) coll)
+  (->> coll
+       (map #(do [% %]))
        (apply concat '())))
 
 (defn my-range
