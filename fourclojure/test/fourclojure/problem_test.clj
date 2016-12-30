@@ -73,3 +73,9 @@
   (is (= (caps "HeLlO, WoRlD!") "HLOWRD"))
   (is (empty? (caps "nothing")))
   (is (= (caps "$#A(*&987Zf") "AZ")))
+
+(deftest Duplicate-a-Sequence-32
+  (is (= (duplicate-sequence [1 2 3]) '(1 1 2 2 3 3)))
+  (is (= (duplicate-sequence [:a :a :b :b]) '(:a :a :a :a :b :b :b :b)))
+  (is (= (duplicate-sequence [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4])))
+  (is (= (duplicate-sequence [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4]))))

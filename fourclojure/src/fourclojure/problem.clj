@@ -167,3 +167,9 @@
                        \R \S \T \U \V \W \X \Y \Z}]
     (->> (filter #(contains? upper-letter %) (vec chars))
          (apply str))))
+
+(defn duplicate-sequence
+  "32: duplicate a sequence"
+  [coll]
+  (->> (map (fn [x] [x x]) coll)
+       (apply concat '())))
