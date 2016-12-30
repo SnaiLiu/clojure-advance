@@ -181,3 +181,13 @@
   [start end]
   (->> (iterate inc start)
        (take (- end start))))
+
+(defn compress-sequence
+  "30：序列去重
+  参考答案：#(map last (partition-by list %))"
+  [coll]
+  (let [v (vec coll)]
+    (->> (map #(do [%1 %2]) (pop v) (rest v))
+         (filter #(not= (first %) (last %)))
+         (mapv first)
+         (#(conj % (peek v))))))

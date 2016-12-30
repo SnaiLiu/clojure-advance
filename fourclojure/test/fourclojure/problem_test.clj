@@ -84,3 +84,8 @@
   (is (= (my-range 1 4) '(1 2 3)))
   (is (= (my-range -2 2) '(-2 -1 0 1)))
   (is (= (my-range 5 8) '(5 6 7))))
+
+(deftest ﻿Compress-a-Sequence-30
+  (is (= (apply str (compress-sequence "Leeeeeerrroyyy")) "Leroy"))
+  (is (= (compress-sequence [1 1 2 3 3 2 2 3]) '(1 2 3 2 3)))
+  (is (= (compress-sequence [[1 2] [1 2] [3 4] [1 2]]) '([1 2] [3 4] [1 2]))))
