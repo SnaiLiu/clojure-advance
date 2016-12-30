@@ -175,3 +175,9 @@
   [coll]
   (->> (map (fn [x] [x x]) coll)
        (apply concat '())))
+
+(defn my-range
+  "34：实现range函数"
+  [start end]
+  (->> (iterate inc start)
+       (take (- end start))))

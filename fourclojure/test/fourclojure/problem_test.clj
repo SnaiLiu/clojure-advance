@@ -79,3 +79,8 @@
   (is (= (duplicate-sequence [:a :a :b :b]) '(:a :a :a :a :b :b :b :b)))
   (is (= (duplicate-sequence [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4])))
   (is (= (duplicate-sequence [[1 2] [3 4]]) '([1 2] [1 2] [3 4] [3 4]))))
+
+(deftest Implement-range-34
+  (is (= (my-range 1 4) '(1 2 3)))
+  (is (= (my-range -2 2) '(-2 -1 0 1)))
+  (is (= (my-range 5 8) '(5 6 7))))
