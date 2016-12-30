@@ -169,7 +169,9 @@
          (apply str))))
 
 (defn duplicate-sequence
-  "32: duplicate a sequence"
+  "32: duplicate a sequence
+  参考答案：#(interleave % %)
+  其中，interleave函数，返回各个coll的第一个元素，再第二个元素，再第三个元素..."
   [coll]
   (->> (map (fn [x] [x x]) coll)
        (apply concat '())))
