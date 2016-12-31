@@ -89,3 +89,10 @@
   (is (= (apply str (compress-sequence "Leeeeeerrroyyy")) "Leroy"))
   (is (= (compress-sequence [1 1 2 3 3 2 2 3]) '(1 2 3 2 3)))
   (is (= (compress-sequence [[1 2] [1 2] [3 4] [1 2]]) '([1 2] [3 4] [1 2]))))
+
+
+(deftest Factorial-Fun
+  (is (= (cal-factorials 1) 1))
+  (is (= (cal-factorials 3) 6))
+  (is (= (cal-factorials 5) 120))
+  (is (= (cal-factorials 8) 40320)))

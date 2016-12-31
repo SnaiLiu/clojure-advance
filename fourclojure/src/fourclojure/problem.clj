@@ -192,3 +192,9 @@
          (filter #(not= (first %) (last %)))
          (mapv first)
          (#(conj % (peek v))))))
+
+(defn cal-factorials
+  "42: Write a function which calculates factorials(阶乘)."
+  [n]
+  (->> (range 1 (+ 1 n))
+       (apply *')))
