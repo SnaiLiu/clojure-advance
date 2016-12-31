@@ -188,7 +188,7 @@
   参考答案：#(map last (partition-by list %))"
   [coll]
   (let [v (vec coll)]
-    (->> (map #(do [%1 %2]) (pop v) (rest v))
+    (->> (map list (pop v) (rest v))
          (filter #(not= (first %) (last %)))
          (mapv first)
          (#(conj % (peek v))))))
@@ -198,3 +198,12 @@
   [n]
   (->> (range 1 (+ 1 n))
        (apply *')))
+
+(defn interleave-seqs
+  "39: Write a function which takes two sequences and returns the first item from each,
+  then the second item from each, then the third, etc.
+  参考答案： mapcat list"
+  [coll1 coll2]
+  (->> (map #(do [%1 %2]) coll1 coll2)
+       (filter #(not-any? nil? %))
+       (apply concat)))
