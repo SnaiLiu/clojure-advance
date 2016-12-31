@@ -205,5 +205,4 @@
   参考答案： mapcat list"
   [coll1 coll2]
   (->> (map #(do [%1 %2]) coll1 coll2)
-       (filter #(not-any? nil? %))
        (apply concat)))
