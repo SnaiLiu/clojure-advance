@@ -202,7 +202,59 @@
 (defn interleave-seqs
   "39: Write a function which takes two sequences and returns the first item from each,
   then the second item from each, then the third, etc.
-  参考答案： mapcat list"
+  参考答案： mapcat list
+  clojure自带函数：interleave"
   [coll1 coll2]
   (->> (map #(do [%1 %2]) coll1 coll2)
        (apply concat)))
+
+;(defn __
+;  "28: Write a function which flattens a sequence.
+;  clojure自带函数：flatten"
+;  [coll]
+;  ()
+;  )
+
+(defn replicate-sequence
+  "33: Write a function which replicates each element of a sequence a variable number of times.
+  参考答案：(mapcat #(repeat n %) coll)"
+  [coll n]
+  (let [copy-fn (fn [x]
+                  (loop [r [] i n]
+                    (if (= 0 i)
+                      r
+                      (recur (conj r x) (dec i)))))]
+    (mapcat copy-fn coll)))
+
+(defn interpose-sequence
+  "clojure自带函数：interpose
+  40: Write a function which separates the items of a sequence by an arbitrary value."
+  [item coll]
+  (->> (repeat (count coll) item)
+       (interleave coll)
+       butlast))
+
+(defn prime?
+  "判断一个数是否是素数"
+  [x]
+  (let [sqrted-x (int (Math/sqrt x))
+        target-numbers (range 2 (+ 1 sqrted-x))]
+    (not (or (= 1 x)
+             (some #(= 0 (mod x %)) target-numbers)))))
+
+(defn prime-numbers1
+  "求1到n的所有素数——常规方法"
+  [n]
+  (->> (range 1 (+ n 1))
+       (filter prime?)))
+
+(defn prime-numbers
+  "筛法求1到n的所有哦素数
+  3w以内0.6s
+  5w就堆栈溢出了"
+  [n]
+  (let [src-seq (range 2 (+ 1 n))]
+    (loop [i-prime (first src-seq) r src-seq out-seq []]
+      (if (empty? r)
+        out-seq
+        (recur (second r) (filter #(not= 0 (mod % i-prime)) r) (conj out-seq i-prime))))))

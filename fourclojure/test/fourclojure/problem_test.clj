@@ -102,3 +102,25 @@
   (is (= (interleave-seqs [1 2] [3 4 5 6]) '(1 3 2 4)))
   (is (= (interleave-seqs [1 2 3 4] [5]) [1 5]))
   (is (= (interleave-seqs [30 20] [25 15]) [30 25 20 15])))
+
+;(deftest Flatten-a-Sequence
+;  (is (= (__ '((1 2) 3 [4 [5 6]])) '(1 2 3 4 5 6)))
+;  (is (= (__ ["a" ["b"] "c"]) '("a" "b" "c")))
+;  (is (= (__ '((((:a))))) '(:a))))
+
+(deftest Replicate-a-Sequence
+  (is (= (replicate-sequence [1 2 3] 2) '(1 1 2 2 3 3)))
+  (is (= (replicate-sequence [:a :b] 4) '(:a :a :a :a :b :b :b :b)))
+  (is (= (replicate-sequence [4 5 6] 1) '(4 5 6)))
+  (is (= (replicate-sequence [[1 2] [3 4]] 2) '([1 2] [1 2] [3 4] [3 4])))
+  (is (= (replicate-sequence [44 33] 2) [44 44 33 33])))
+
+(deftest Interpose-a-Seq
+  (is (= (interpose-sequence 0 [1 2 3]) [1 0 2 0 3]))
+  (is (= (apply str (interpose-sequence ", " ["one" "two" "three"])) "one, two, three"))
+  (is (= (interpose-sequence :z [:a :b :c :d]) [:a :z :b :z :c :z :d])))
+
+(deftest prime-numbers-test
+  (is (= (prime-numbers 2) '(2)))
+  (is (= (prime-numbers 10) '(2 3 5 7)))
+  (is (= (prime-numbers 20) '(2 3 5 7 11 13 17 19))))
