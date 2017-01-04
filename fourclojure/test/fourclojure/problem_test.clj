@@ -144,3 +144,8 @@
   (is (= (split-sequence 3 [1 2 3 4 5 6]) [[1 2 3] [4 5 6]]))
   (is (= (split-sequence 1 [:a :b :c :d]) [[:a] [:b :c :d]]))
   (is (= (split-sequence 2 [[1 2] [3 4] [5 6]]) [[[1 2] [3 4]] [[5 6]]])))
+
+(deftest Map-Construction
+  (is (= (map-construction [:a :b :c] [1 2 3]) {:a 1, :b 2, :c 3}))
+  (is (= (map-construction [1 2 3 4] ["one" "two" "three"]) {1 "one", 2 "two", 3 "three"}))
+  (is (= (map-construction [:foo :bar] ["foo" "bar" "baz"]) {:foo "foo", :bar "bar"})))

@@ -310,3 +310,14 @@
     (if (= n (count f))
       [f r]
       (recur (conj f (first r)) (rest r)))))
+
+(defn map-construction
+  "61: Write a function which takes a vector of keys and a vector of values and constructs a map from them.
+  clojure自带函数：zipmap
+  参考答案：#(into {} (map vector % %2))
+  赞，因为map的每一个key-val,其实就是一个[k v]
+  "
+  [keys vals]
+  (->> (interleave keys vals)
+       (partition 2)
+       (reduce #(assoc %1 (first %2) (last %2)) {})))
