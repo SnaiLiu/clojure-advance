@@ -291,3 +291,9 @@
                 (conj (vec r) (list x)))))
           '()
           coll))
+
+(defn drop-nth-item
+  "41: Write a function which drops every Nth item from a sequence."
+  [coll n]
+  (let [[f l] (split-at n coll)]
+    (concat (butlast f) l)))

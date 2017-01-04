@@ -134,3 +134,8 @@
   (is (= (pack-sequence [1 1 2 1 1 1 3 3]) '((1 1) (2) (1 1 1) (3 3))))
   (is (= (pack-sequence [:a :a :b :b :c]) '((:a :a) (:b :b) (:c))))
   (is (= (pack-sequence [[1 2] [1 2] [3 4]]) '(([1 2] [1 2]) ([3 4])))))
+
+(deftest Drop-Every-Nth-Item
+  (is (= (drop-nth-item [1 2 3 4 5 6 7 8] 3) [1 2 4 5 7 8]))
+  (is (= (drop-nth-item [:a :b :c :d :e :f] 2) [:a :c :e]))
+  (is (= (drop-nth-item [1 2 3 4 5 6] 4) [1 2 3 5 6])))
