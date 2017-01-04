@@ -139,3 +139,8 @@
   (is (= (drop-nth-item [1 2 3 4 5 6 7 8 9 10] 3) [1 2 4 5 7 8 10]))
   (is (= (drop-nth-item [:a :b :c :d :e :f] 2) [:a :c :e]))
   (is (= (drop-nth-item [1 2 3 4 5 6] 4) [1 2 3 5 6])))
+
+(deftest Split-a-sequence
+  (is (= (split-sequence 3 [1 2 3 4 5 6]) [[1 2 3] [4 5 6]]))
+  (is (= (split-sequence 1 [:a :b :c :d]) [[:a] [:b :c :d]]))
+  (is (= (split-sequence 2 [[1 2] [3 4] [5 6]]) [[[1 2] [3 4]] [[5 6]]])))

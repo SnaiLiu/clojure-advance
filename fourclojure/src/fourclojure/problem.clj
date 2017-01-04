@@ -300,3 +300,13 @@
     (if (< (count r) n )
       (concat (reduce #(concat %1 (butlast %2)) '() f) r)
       (recur (conj f (first (split-at n r))) (second (split-at n r))))))
+
+(defn split-sequence
+  "49: Write a function which will split a sequence into two parts.
+  参考答案：(juxt take drop)
+  juxt 用法：((juxt a b c) x) => [(a x) (b x) (c x)]"
+  [n coll]
+  (loop [f [] r coll]
+    (if (= n (count f))
+      [f r]
+      (recur (conj f (first r)) (rest r)))))
