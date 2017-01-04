@@ -129,3 +129,8 @@
   (is (= (take 3 (primes)) '(2 3 5)))
   (is (= (take 5 (primes)) '(2 3 5 7 11)))
   (is (= (take 1 (primes)) '(2))))
+
+(deftest Pack-a-Sequence
+  (is (= (pack-sequence [1 1 2 1 1 1 3 3]) '((1 1) (2) (1 1 1) (3 3))))
+  (is (= (pack-sequence [:a :a :b :b :c]) '((:a :a) (:b :b) (:c))))
+  (is (= (pack-sequence [[1 2] [1 2] [3 4]]) '(([1 2] [1 2]) ([3 4])))))

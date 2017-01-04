@@ -281,3 +281,13 @@
                   (map (fn [[n]] (dec n))))
             (iterate seive [2 {}])))
 
+(defn pack-sequence
+  "31: pack a sequence"
+  [coll]
+  (reduce (fn [r x]
+            (let [last-coll (last r)]
+              (if (= x (last last-coll))
+                (conj (vec (butlast r)) (concat last-coll (list x)))
+                (conj (vec r) (list x)))))
+          '()
+          coll))
