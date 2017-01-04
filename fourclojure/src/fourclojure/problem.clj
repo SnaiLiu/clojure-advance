@@ -293,7 +293,10 @@
           coll))
 
 (defn drop-nth-item
-  "41: Write a function which drops every Nth item from a sequence."
+  "41: Write a function which drops every Nth item from a sequence.
+  参考答案：#(flatten (partition (- %2 1) %2 nil %1))"
   [coll n]
-  (let [[f l] (split-at n coll)]
-    (concat (butlast f) l)))
+  (loop [f [] r coll]
+    (if (< (count r) n )
+      (concat (reduce #(concat %1 (butlast %2)) '() f) r)
+      (recur (conj f (first (split-at n r))) (second (split-at n r))))))
