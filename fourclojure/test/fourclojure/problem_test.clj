@@ -124,3 +124,8 @@
   (is (= (prime-numbers 2) '(2)))
   (is (= (prime-numbers 10) '(2 3 5 7)))
   (is (= (prime-numbers 20) '(2 3 5 7 11 13 17 19))))
+
+(deftest primes-test
+  (is (= (take 3 (primes)) '(2 3 5)))
+  (is (= (take 5 (primes)) '(2 3 5 7 11)))
+  (is (= (take 1 (primes)) '(2))))

@@ -151,9 +151,9 @@
   简洁答案：#(last (sort %&))"
   [& coll]
   (let [tmp-max-fn (fn [tmp-max val]
-                    (if (> val tmp-max)
-                      val
-                      tmp-max))]
+                     (if (> val tmp-max)
+                       val
+                       tmp-max))]
     (loop [i (count coll) tmp-max (first coll) r coll]
       (if (= 1 i)
         tmp-max
@@ -258,3 +258,26 @@
       (if (empty? r)
         out-seq
         (recur (second r) (filter #(not= 0 (mod % i-prime)) r) (conj out-seq i-prime))))))
+
+;(defn pcs [n sm]
+;  (reduce #(update % (+ %2 n) conj %2) (dissoc sm n) (sm n)))
+;
+;(pcs 4 {4 [2] 6 [3]})
+;
+;(defn sieve
+;  [[n sm]]
+;  (let [sm (assoc sm (+ n n) conj n)]
+;    (if (sm (inc n))
+;      [(inc n) (pcs (inc n) sm)]
+;      [(inc n) sm])))
+
+(defn seive  [[n sm]]
+  (if-let  [factors  (sm n)]
+    [(inc n) (reduce #(update %1 (+ n %2) conj %2) (dissoc sm n) factors)]
+    [(inc n) (assoc sm  (+ n n) #{n}) true]))
+
+(defn primes []
+  (sequence (comp (filter (fn [[_ _ p]] p))
+                  (map (fn [[n]] (dec n))))
+            (iterate seive [2 {}])))
+
