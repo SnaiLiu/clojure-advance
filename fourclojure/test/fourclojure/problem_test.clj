@@ -154,3 +154,9 @@
   (is (= (greatest-common-divisor 2 4) 2))
   (is (= (greatest-common-divisor 1023 858) 33)))
 
+(deftest Re-implement-Iterate
+  (is (= (take 5 (my-iterate #(* 2 %) 1)) [1 2 4 8 16]))
+  (is (= (take 100 (my-iterate inc 0)) (take 100 (range))))
+  (is (= (take 9 (my-iterate #(inc (mod % 3)) 1)) (take 9 (cycle [1 2 3]))))
+                       )
+

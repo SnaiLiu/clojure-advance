@@ -331,3 +331,11 @@
        (iterate dec)
        (filter #(= 0 (mod x %) (mod y %)))
        first))
+
+(defn my-iterate
+  "62: Given a side-effect free function f and an initial value x write a function which returns an infinite
+  lazy sequence of x, (f x), (f (f x)), (f (f (f x))), etc.
+  clojure自带函数：iterate"
+  [f val]
+  (lazy-seq
+    (cons val (my-iterate f (f val)))))
