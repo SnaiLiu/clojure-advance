@@ -335,7 +335,8 @@
 (defn my-iterate
   "62: Given a side-effect free function f and an initial value x write a function which returns an infinite
   lazy sequence of x, (f x), (f (f x)), (f (f (f x))), etc.
-  clojure自带函数：iterate"
+  clojure自带函数：iterate
+  参考答案：(fn i [f x] (lazy-cat [x] (i f (f x))))"
   [f val]
   (lazy-seq
     (cons val (my-iterate f (f val)))))
