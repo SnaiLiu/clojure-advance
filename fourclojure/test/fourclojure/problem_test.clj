@@ -157,6 +157,10 @@
 (deftest Re-implement-Iterate
   (is (= (take 5 (my-iterate #(* 2 %) 1)) [1 2 4 8 16]))
   (is (= (take 100 (my-iterate inc 0)) (take 100 (range))))
-  (is (= (take 9 (my-iterate #(inc (mod % 3)) 1)) (take 9 (cycle [1 2 3]))))
-                       )
+  (is (= (take 9 (my-iterate #(inc (mod % 3)) 1)) (take 9 (cycle [1 2 3])))))
+
+(deftest clurese
+  (is (= 256 ((simple-clourse 2) 16), ((simple-clourse 8) 2)))
+  (is (= [1 8 27 64] (map (simple-clourse 3) [1 2 3 4])))
+  (is (= [1 2 4 8 16] (map #((simple-clourse %) 2) [0 1 2 3 4]))))
 

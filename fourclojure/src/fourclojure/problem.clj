@@ -340,3 +340,9 @@
   [f val]
   (lazy-seq
     (cons val (my-iterate f (f val)))))
+
+(defn simple-clourse
+  "107: 闭包"
+  [x]
+  (fn [n]
+    (apply * (repeat x n))))
