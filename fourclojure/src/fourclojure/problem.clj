@@ -346,3 +346,12 @@
   [x]
   (fn [n]
     (apply * (repeat x n))))
+
+(defn cartesian-product
+  "90: cartesian-product
+  参考答案：#(set (for [x % y %2] [x y]))"
+  [set1 set2]
+  (->> (map (fn [val]
+              (map #(do [% val]) set1))
+            set2)
+       (reduce into #{})))
