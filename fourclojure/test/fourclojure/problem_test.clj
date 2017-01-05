@@ -149,3 +149,8 @@
   (is (= (map-construction [:a :b :c] [1 2 3]) {:a 1, :b 2, :c 3}))
   (is (= (map-construction [1 2 3 4] ["one" "two" "three"]) {1 "one", 2 "two", 3 "three"}))
   (is (= (map-construction [:foo :bar] ["foo" "bar" "baz"]) {:foo "foo", :bar "bar"})))
+
+(deftest Greatest-Common-Divisor
+  (is (= (greatest-common-divisor 2 4) 2))
+  (is (= (greatest-common-divisor 1023 858) 33)))
+

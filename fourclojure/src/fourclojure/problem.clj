@@ -321,3 +321,13 @@
   (->> (interleave keys vals)
        (partition 2)
        (reduce #(assoc %1 (first %2) (last %2)) {})))
+
+(defn greatest-common-divisor
+  "66: Given two integers, write a function which returns the greatest common divisor.
+  参考答案：#(if (= 0 %2) % (recur %2 (mod % %2)))
+  辗转相除法基于如下原理：两个整数的最大公约数等于其中较小的数和两数的差的最大公约数。"
+  [x y]
+  (->> (min x y)
+       (iterate dec)
+       (filter #(= 0 (mod x %) (mod y %)))
+       first))
