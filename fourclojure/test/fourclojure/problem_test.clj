@@ -182,3 +182,8 @@
                           '[S2 S3 S4 S5 S6 S7
                             S8 S9 ST SJ SQ SK SA]))))
 
+(deftest Product-Digits
+  (is (= (product-digits 1 1) [1]))
+  (is (= (product-digits 99 9) [8 9 1]))
+  (is (= (product-digits 999 99) [9 8 9 0 1])))
+

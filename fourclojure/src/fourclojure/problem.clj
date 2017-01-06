@@ -369,3 +369,9 @@
                     (map vector original-ranks)
                     (into {}))]
     {:suit (suits s) :rank (rank-m r)}))
+
+(defn product-digits
+  "99: Write a function which multiplies two numbers and returns the result as a sequence of its digits."
+  [x y]
+  (->> (str (* x y))
+       (map #(Integer/parseInt (str %)))))
