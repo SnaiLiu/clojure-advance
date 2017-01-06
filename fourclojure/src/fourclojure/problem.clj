@@ -395,7 +395,8 @@
        (apply +)))
 
 (defn binary->number
-  "122: Convert a binary number, provided in the form of a string, to its numerical value."
+  "122: Convert a binary number, provided in the form of a string, to its numerical value.
+  参考答案：(Long/praseLong % 2)"
   [binary-str]
   (->> (zipmap (range (count binary-str)) (reverse binary-str))
        (map (fn [[k v]]
