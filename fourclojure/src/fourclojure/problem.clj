@@ -417,3 +417,13 @@
         c1 (reduce #(+ % (count %2)) 0 ss-seq)
         c2 (count (reduce clojure.set/union #{} ss-seq))]
     (= c1 c2)))
+
+(defn trees-into-tables
+  "146#
+  参考答案：#(into {} (for [[k v] % [x y] v] [[k x] y]))"
+  [m]
+  (->> (for [[k v] m]
+         (for [[k2 v2] v]
+           {[k k2] v2}))
+       (apply concat)
+       (apply merge-with into)))
