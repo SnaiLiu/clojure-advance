@@ -174,3 +174,11 @@
   (is (= 300 (count (cartesian-product (into #{} (range 10))
                          (into #{} (range 30)))))))
 
+(deftest Recognize-Playing-Cards
+  (is (= {:suit :diamond :rank 10} (recognize-cards "DQ")))
+  (is (= {:suit :heart :rank 3} (recognize-cards "H5")))
+  (is (= {:suit :club :rank 12} (recognize-cards "CA")))
+  (is (= (range 13) (map (comp :rank recognize-cards str)
+                          '[S2 S3 S4 S5 S6 S7
+                            S8 S9 ST SJ SQ SK SA]))))
+

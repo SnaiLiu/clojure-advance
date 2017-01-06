@@ -355,3 +355,17 @@
               (map #(do [% val]) set1))
             set2)
        (reduce into #{})))
+
+(defn recognize-cards
+  "128
+  参考答案，基本一致，但直接用zipmap就能实现rank-m了"
+  [[s r]]
+  (let [suits {\D :diamond
+              \H :heart
+              \C :club
+              \S :spade}
+        original-ranks "23456789TJQKA"
+        rank-m (->> (range (count original-ranks))
+                    (map vector original-ranks)
+                    (into {}))]
+    {:suit (suits s) :rank (rank-m r)}))
