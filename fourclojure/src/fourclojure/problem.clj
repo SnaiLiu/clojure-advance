@@ -387,3 +387,19 @@
                 (assoc r result [v]))))
           {}
           seqs))
+
+(defn dot-product
+  "143: dot product"
+  [vec1 vec2]
+  (->> (map * vec1 vec2)
+       (apply +)))
+
+(defn binary->number
+  "122: Convert a binary number, provided in the form of a string, to its numerical value."
+  [binary-str]
+  (->> (zipmap (range (count binary-str)) (reverse binary-str))
+       (map (fn [[k v]]
+              (if (= \1 v)
+                (apply * (repeat k 2))
+                0)))
+       (apply +)))

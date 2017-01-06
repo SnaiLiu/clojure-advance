@@ -194,4 +194,19 @@
   (is (= (group-seq count [[1] [1 2] [3] [1 2 3] [2 3]])
          {1 [[1] [3]], 2 [[1 2] [2 3]], 3 [[1 2 3]]})))
 
+(deftest Dot-Product
+  (is (= 0 (dot-product [0 1 0] [1 0 0])))
+  (is (= 3 (dot-product [1 1 1] [1 1 1])))
+  (is (= 32 (dot-product [1 2 3] [4 5 6])))
+  (is (= 256 (dot-product [2 5 6] [100 10 1]))))
+
+(deftest Read-a-binary-number
+  (is (= 0 (binary->number "0")))
+  (is (= 7 (binary->number "111")))
+  (is (= 8 (binary->number "1000")))
+  (is (= 9 (binary->number "1001")))
+  (is (= 255 (binary->number "11111111")))
+  (is (= 1365 (binary->number "10101010101")))
+  (is (= 65535 (binary->number "1111111111111111"))))
+
 
