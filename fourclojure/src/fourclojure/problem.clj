@@ -375,3 +375,15 @@
   [x y]
   (->> (str (* x y))
        (map #(Integer/parseInt (str %)))))
+
+(defn group-seq
+  "参考答案：#(apply merge-with into (for [v %2] {(% v) [v]}))
+  clojure自带函数：group-by"
+  [f seqs]
+  (reduce (fn [r v]
+            (let [result (f v)]
+              (if-let [val (r result)]
+                (assoc r result (conj val v))
+                (assoc r result [v]))))
+          {}
+          seqs))
