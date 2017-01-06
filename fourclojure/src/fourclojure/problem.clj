@@ -404,3 +404,16 @@
                 (apply * (repeat k 2))
                 0)))
        (apply +)))
+
+(defn pairwise-disjoint
+  "153#
+  参考答案：#(apply distinct? (mapcat seq %))
+  ???疑问：distinct用法(distinct? 1 2 3 3)
+          (mapcat seq #{#{1 2 3} #{2 3 4}}) => '(1 2 3 2 3)
+          (apply distinct? '(1 2 3 2 3)) 等价于 (distinct? 1 2 3 2 3)??
+          "
+  [ss]
+  (let [ss-seq (seq ss)
+        c1 (reduce #(+ % (count %2)) 0 ss-seq)
+        c2 (count (reduce clojure.set/union #{} ss-seq))]
+    (= c1 c2)))

@@ -209,4 +209,50 @@
   (is (= 1365 (binary->number "10101010101")))
   (is (= 65535 (binary->number "1111111111111111"))))
 
+(deftest Pairwise-Disjoint-Sets
+  (is (= (pairwise-disjoint #{#{\U} #{\s} #{\e \R \E} #{\P \L} #{\.}})
+         true))
+  (is (= (pairwise-disjoint #{#{:a :b :c :d :e}
+                #{:a :b :c :d}
+                #{:a :b :c}
+                #{:a :b}
+                #{:a}})
+          false))
+  (is (= (pairwise-disjoint #{#{[1 2 3] [4 5]}
+                #{[1 2] [3 4 5]}
+                #{[1] [2] 3 4 5}
+                #{1 2 [3 4] [5]}})
+          true))
+  (is (= (pairwise-disjoint #{#{'a 'b}
+                #{'c 'd 'e}
+                #{'f 'g 'h 'i}
+                #{''a ''c ''f}})
+          true))
+  (is (= (pairwise-disjoint #{#{'(:x :y :z) '(:x :y) '(:z) '()}
+                #{#{:x :y :z} #{:x :y} #{:z} #{}}
+                #{'[:x :y :z] [:x :y] [:z] [] {}}})
+          false))
+  (is (= (pairwise-disjoint #{#{(= "true") false}
+                #{:yes :no}
+                #{(class 1) 0}
+                #{(symbol "true") 'false}
+                #{(keyword "yes") ::no}
+                #{(class '1) (int \0)}})
+          false))
+  (is (= (pairwise-disjoint #{#{distinct?}
+                #{#(-> %) #(-> %)}
+                #{#(-> %) #(-> %) #(-> %)}
+                #{#(-> %) #(-> %) #(-> %)}})
+          true))
+  (is (= (pairwise-disjoint #{#{distinct?}
+                #{#(-> %) #(-> %)}
+                #{#(-> %) #(-> %) #(-> %)}
+                #{#(-> %) #(-> %) #(-> %)}})
+          true))
+  (is (= (pairwise-disjoint #{#{(#(-> *)) + (quote mapcat) #_ nil}
+                #{'+ '* mapcat (comment mapcat)}
+                #{(do) set contains? nil?}
+                #{, , , #_, , empty?}})
+          false)))
+
 
