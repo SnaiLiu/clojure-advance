@@ -433,17 +433,11 @@
   [[root left right]]
   (let [symmetry? (fn symmetry? [l r]
                     (cond
-                      (not= (sequential? l) (sequential? r)) (do (prn "false") false)
+                      (not= (sequential? l) (sequential? r)) false
                       (sequential? l) (let [[lroot ll lr] l
                                      [rroot rl rr] r]
-                                 (prn (and (= lroot rroot)
-                                           (symmetry? ll rr)
-                                           (symmetry? lr rl)))
                                  (and (= lroot rroot)
                                       (symmetry? ll rr)
                                       (symmetry? lr rl)))
-                      :else (do (prn (= l r)) (= l r))))]
-    (symmetry? left right))
-  
-
-  )
+                      :else (= l r)))]
+    (symmetry? left right)))

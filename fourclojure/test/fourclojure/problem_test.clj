@@ -269,16 +269,16 @@
           '{[m 1] [a b c], [m 3] nil})))
 
 (deftest Beauty-Is-Symmetry
-  (is (= (symmetry-seq? '(:a (:b nil nil) (:b nil nil))) true))
-  (is (= (symmetry-seq? '(:a (:b nil nil) (:b nil nil))) true))
-  (is (= (symmetry-seq? '(:a (:b nil nil) (:c nil nil))) false))
-  (is (= (symmetry-seq? [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+  (is (= (symmetry-tree? '(:a (:b nil nil) (:b nil nil))) true))
+  (is (= (symmetry-tree? '(:a (:b nil nil) (:b nil nil))) true))
+  (is (= (symmetry-tree? '(:a (:b nil nil) (:c nil nil))) false))
+  (is (= (symmetry-tree? [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
                 [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])
           true))
-  (is (= (symmetry-seq? [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+  (is (= (symmetry-tree? [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
                [2 [3 nil [4 [5 nil nil] [6 nil nil]]] nil]])
           false))
-  (is (= (symmetry-seq? [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+  (is (= (symmetry-tree? [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
                [2 [3 nil [4 [6 nil nil] nil]] nil]])
           false))
   )
