@@ -427,3 +427,23 @@
            {[k k2] v2}))
        (apply concat)
        (apply merge-with into)))
+
+(defn symmetry-tree?
+  "96: 是否为对称树"
+  [[root left right]]
+  (let [symmetry? (fn symmetry? [l r]
+                    (cond
+                      (not= (sequential? l) (sequential? r)) (do (prn "false") false)
+                      (sequential? l) (let [[lroot ll lr] l
+                                     [rroot rl rr] r]
+                                 (prn (and (= lroot rroot)
+                                           (symmetry? ll rr)
+                                           (symmetry? lr rl)))
+                                 (and (= lroot rroot)
+                                      (symmetry? ll rr)
+                                      (symmetry? lr rl)))
+                      :else (do (prn (= l r)) (= l r))))]
+    (symmetry? left right))
+  
+
+  )
