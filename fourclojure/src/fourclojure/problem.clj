@@ -429,7 +429,8 @@
        (apply merge-with into)))
 
 (defn symmetry-tree?
-  "96: 是否为对称树"
+  "96: 是否为对称树
+  参考答案：#(= % ((fn m [[v l r]] (if v [v (m r) (m l)])) %))"
   [[root left right]]
   (let [symmetry? (fn symmetry? [l r]
                     (cond
