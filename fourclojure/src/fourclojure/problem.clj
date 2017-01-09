@@ -472,7 +472,10 @@
     (iterate n-fn [1])))
 
 (defn pascal-triangle2
-  "97: 求第n行杨辉三角数"
+  "97: 求第n行杨辉三角数
+  参考答案：(fn [n] (nth (iterate #(map + `[0 ~@%] `[~@% 0]) [1]) (dec n)))
+  ？？？疑问：`[0 ~@%]的用法
+  `: "
   [n]
   (nth (pascal-triangles) (dec n)))
 
