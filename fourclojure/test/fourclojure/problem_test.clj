@@ -280,7 +280,28 @@
           false))
   (is (= (symmetry-tree? [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
                [2 [3 nil [4 [6 nil nil] nil]] nil]])
-          false))
-  )
+          false)))
+
+(deftest Pascal's-Triangle
+  (is (= (pascal-triangle 1) [1]))
+  (is (= (map pascal-triangle (range 1 6))
+          [     [1]
+               [1 1]
+              [1 2 1]
+             [1 3 3 1]
+            [1 4 6 4 1]]))
+  (is (= (pascal-triangle 11)
+          [1 10 45 120 210 252 210 120 45 10 1])))
+
+(deftest Pascal's-Triangle2
+  (is (= (pascal-triangle2 1) [1]))
+  (is (= (map pascal-triangle2 (range 1 6))
+         [     [1]
+          [1 1]
+          [1 2 1]
+          [1 3 3 1]
+          [1 4 6 4 1]]))
+  (is (= (pascal-triangle2 11)
+         [1 10 45 120 210 252 210 120 45 10 1])))
 
 

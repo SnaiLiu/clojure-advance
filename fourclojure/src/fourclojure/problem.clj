@@ -442,3 +442,37 @@
                                       (symmetry? lr rl)))
                       :else (= l r)))]
     (symmetry? left right)))
+
+(defn factorial
+  "阶乘"
+  [n]
+  (apply * (range 1 (+ 1 n))))
+
+(defn c-n-m
+  "求组合数C(n,m)"
+  [n m]
+  (quot (factorial n)
+        (* (factorial m)
+           (factorial (- n m)))))
+
+(defn pascal-triangle
+  "求第n行的杨辉三角数"
+  [n]
+  (mapv #(c-n-m (- n 1) %) (range 0 n)))
+
+(defn pascal-triangles
+  "所有的杨辉三角数"
+  []
+  (let [n-fn (fn [n-seq]
+               (let [line-num (count n-seq)]
+                 (if (= 1 line-num)
+                   [1 1]
+                   (->> (map #(+ (nth n-seq %) (nth n-seq (inc %))) (range 0 (- line-num 1)))
+                        (#(concat [1] % [1]))))))]
+    (iterate n-fn [1])))
+
+(defn pascal-triangle2
+  "97: 求第n行杨辉三角数"
+  [n]
+  (nth (pascal-triangles) (dec n)))
+
