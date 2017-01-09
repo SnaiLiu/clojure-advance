@@ -304,4 +304,9 @@
   (is (= (pascal-triangle2 11)
          [1 10 45 120 210 252 210 120 45 10 1])))
 
+(deftest Sum-of-square-of-digits
+  (is (= 8 (sum-square-digits (range 10))))
+  (is (= 19 (sum-square-digits (range 30))))
+  (is (= 50 (sum-square-digits (range 100))))
+  (is (= 50 (sum-square-digits (range 1000)))))
 

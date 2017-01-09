@@ -479,3 +479,12 @@
   [n]
   (nth (pascal-triangles) (dec n)))
 
+(defn sum-square-digits
+  "120: Sum of square of digits"
+  [coll]
+  (let [sum-square (fn [num]
+                    (->> (str num)
+                         (map #(Integer/parseInt (str %)))
+                         (reduce #(+ % (* %2 %2)) 0)))]
+    (->> (filter #(< % (sum-square %)) coll)
+         count)))
