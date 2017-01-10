@@ -488,3 +488,12 @@
                          (reduce #(+ % (* %2 %2)) 0)))]
     (->> (filter #(< % (sum-square %)) coll)
          count)))
+
+(defn my-map
+  "118：重新实现map，惰性序列的实现
+  参考答案：(fn [f x] (rest (reductions #(f %2) nil x)))
+  ??似懂非懂"
+  [f coll]
+  (lazy-seq
+    (when-let [s (seq coll)]
+      (cons (f (first s)) (my-map f (rest s))))))
