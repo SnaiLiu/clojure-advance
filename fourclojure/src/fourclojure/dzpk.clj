@@ -34,8 +34,9 @@
 (defn four-of-a-kind?
   "判断一手牌是否为四炸"
   [pais]
-  (and (= 4 (count pais))
-       (apply = (map last pais))))
+  (let [sorted-nums (sort (map last pais))]
+    (or (apply = (rest sorted-nums))
+        (apply = (butlast sorted-nums)))))
 
 (defn full-house?
   "判断一手牌是否为葫芦"
@@ -64,7 +65,7 @@
     (and (> count-pais 4)
          (= sorted-nums target-nums))))
 
-(defn three-same-nums?
+(defn three-of-a-kind?
   "判断一手牌是否为三同"
   [pais]
   (->> (map last pais)
@@ -80,7 +81,7 @@
        (filter #(= 2 (count (last %))))
        (#(= (count %) 2))))
 
-(defn pairs?
+(defn one-pair?
   "判断一手牌是否为对子"
   [pais]
   (->> (map last pais)
@@ -88,14 +89,42 @@
        count
        (= (dec (count pais)))))
 
-(defn single?
+(defn high-card?
   "判断一手牌是否是高张"
   [pais]
   (let [nums (map last pais)]
-    (= nums
-       (distinct nums))))
+    (and (not (straight? pais))
+         (= nums (distinct nums)))))
+
+(defn mk-paixing-filter
+  "构造牌型过滤器"
+  [paixing-name check-fn]
+  (fn [[curr-paixing pais]]
+    (if curr-paixing
+      [curr-paixing pais]
+      (if (check-fn pais)
+        [paixing-name pais]
+        [curr-paixing pais]))))
+
+(defn paixing-filters
+  "牌型过滤器，必须依照牌型从大到小的顺序组装各个过滤器。"
+  [pais]
+  (-> [nil pais]
+      ((mk-paixing-filter :royal-flush royal-flush?))
+      ((mk-paixing-filter :straight-flush straight-flush?))
+      ((mk-paixing-filter :4-of-a-kind four-of-a-kind?))
+      ((mk-paixing-filter :full-house full-house?))
+      ((mk-paixing-filter :flush flush?))
+      ((mk-paixing-filter :straight straight?))
+      ((mk-paixing-filter :three-of-a-kind three-of-a-kind?))
+      ((mk-paixing-filter :two-pairs two-pairs?))
+      ((mk-paixing-filter :one-pair one-pair?))
+      ((mk-paixing-filter :high-card high-card?))))
+
+
+
 
 ;;=============================
-(defn paixing
-  [pais]
-  )
+;(defn paixing
+;  [pais]
+;  )
