@@ -346,7 +346,11 @@
   [classified-cards]
   (let [three (:3 classified-cards)
         max-three (first three)
-        max-two (or (second three) (first (:2 classified-cards)))
+        second-three (second three)
+        first-two (first (:2 classified-cards))
+        max-two (if (and second-three first-two)
+                  (max second-three first-two)
+                  (or second-three first-two))
         original-cards (:original classified-cards)]
     (when (and max-three max-two)
       [:full-house (into (cards-by-num original-cards max-three 3)
@@ -382,25 +386,28 @@
     (when max-three
       [:three-of-a-kind (into (cards-by-num original-cards max-three 3)
                               (mapcat #(cards-by-num original-cards % 1) max-two-nums))])))
-;
-;(defn two-pairs-filter
-;  "过滤出最大的两对"
-;  [pais]
-;  (let [group-by-num (group-by last pais)
-;        guess-two (->> (filter #(= (count (last %)) 2) group-by-num)
-;                       (sort #(> (first %1) (first %2)))
-;                       (take 2)
-;                       (map last)
-;                       (#(when-not (empty? %)
-;                           (apply into [] %))))
-;        not-include-fn (fn [vs v]
-;                         (every? #(not= v %) vs))
-;        guess-single (when (= (count guess-two) 4)
-;                       (->> (filter #(not-include-fn guess-two %) pais)
-;                            (#(sort-by-num % >))
-;                            first))]
-;    (when-not (empty? guess-single)
-;      [:two-pairs (conj guess-two guess-single)])))
+
+(defn two-pairs-filter
+  "过滤出最大的两对"
+  [classified-cards]
+  (let [pairs (:2 classified-cards)
+        max-two-pairs (take 2 pairs)
+        ; 对子中（除去已被最大的两对），剩下最大对子
+        next-two (when (>  (count pairs) 2)
+                   (-> (vec pairs)
+                       (subvec 2)
+                       first))
+        ; 单牌中，最大的单牌
+        max-one (first (:1 classified-cards))
+        ; 最大的牌
+        max-single-num (if (and max-one next-two)
+                         (max next-two max-one)
+                         (or max-one next-two))
+        original-cards (:original classified-cards)]
+    (when (= 2 (count max-two-pairs))
+      [:two-pairs (-> (mapcat #(cards-by-num original-cards % 2) max-two-pairs)
+                      vec
+                      (into (cards-by-num original-cards max-single-num 1)))])))
 ;
 ;(defn one-pair-filter
 ;  "过滤出最大的一对"

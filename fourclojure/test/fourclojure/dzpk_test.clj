@@ -145,6 +145,12 @@
     (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 11] [:s 3][:c 3]])
     [:full-house [[:s 13] [:d 13] [:c 13] [:s 3] [:c 3]]]
 
+    (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 12] [:s 12][:c 3]])
+    [:full-house [[:s 13] [:d 13] [:c 13] [:h 12] [:d 12]]]
+
+    (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 12] [:s 12][:c 3] [:d 3]])
+    [:full-house [[:s 13] [:d 13] [:c 13] [:h 12] [:d 12]]]
+
     (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 11] [:s 9][:c 3]])
     nil))
 
@@ -186,6 +192,21 @@
     (cards-classify [[:s 14] [:h 14] [:s 13] [:c 13] [:c 9] [:s 8][:c 3]])
     nil
     ))
+
+(deftest two-pairs-filter-test
+  (are [cards result]
+    (= (two-pairs-filter cards) result)
+
+    (cards-classify [[:s 14] [:h 14] [:s 13] [:c 13] [:c 9] [:s 9][:c 3]])
+    [:two-pairs [[:s 14] [:h 14] [:s 13] [:c 13] [:c 9] ]]
+
+    (cards-classify [[:s 14] [:h 13] [:s 13] [:c 12] [:c 12] [:s 9][:c 3]])
+    [:two-pairs [[:h 13] [:s 13] [:c 12] [:c 12] [:s 14]]]
+
+    (cards-classify [[:s 14] [:h 13] [:s 13] [:c 12] [:c 11] [:s 9][:c 3]])
+    nil
+    ))
+
 
 
 
