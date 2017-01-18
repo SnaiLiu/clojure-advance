@@ -393,10 +393,7 @@
   (let [pairs (:2 classified-cards)
         max-two-pairs (take 2 pairs)
         ; 对子中（除去已被最大的两对），剩下最大对子
-        next-two (when (>  (count pairs) 2)
-                   (-> (vec pairs)
-                       (subvec 2)
-                       first))
+        next-two (nth pairs 2 nil)
         ; 单牌中，最大的单牌
         max-one (first (:1 classified-cards))
         ; 最大的牌
@@ -408,7 +405,7 @@
       [:two-pairs (-> (mapcat #(cards-by-num original-cards % 2) max-two-pairs)
                       vec
                       (into (cards-by-num original-cards max-single-num 1)))])))
-;
+
 ;(defn one-pair-filter
 ;  "过滤出最大的一对"
 ;  [pais]
