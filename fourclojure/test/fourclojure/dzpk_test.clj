@@ -135,6 +135,20 @@
     nil
     ))
 
+(deftest full-house-filter-test
+  (are [cards result]
+    (= (full-house-filter cards) result)
+
+    (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 12] [:s 9][:c 3]])
+    [:full-house [[:s 13] [:d 13] [:c 13] [:h 12] [:d 12]]]
+
+    (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 11] [:s 3][:c 3]])
+    [:full-house [[:s 13] [:d 13] [:c 13] [:s 3] [:c 3]]]
+
+    (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 11] [:s 9][:c 3]])
+    nil))
+
+
 
 
 

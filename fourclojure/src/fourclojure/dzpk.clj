@@ -276,7 +276,8 @@
   "根据牌面数值和所需张数过滤出牌列表"
   [origianl-pais num count]
   (->> (filter #(= num (last %)) origianl-pais)
-       (take count)))
+       (take count)
+       vec))
 
 ;;===============================
 ;; 牌型判断
@@ -340,16 +341,16 @@
     (when max-four-num
       [:4-of-a-kind [[:s max-four-num] [:c max-four-num] [:h max-four-num] [:d max-four-num] max-one-card]])))
 
-;(defn full-house-filter
-;  "过滤出最大的葫芦"
-;  [classified-pais]
-;  (let [three (:3 classified-pais)
-;        max-three (first three)
-;        max-two (or (second three) (first (:2 classified-pais)))]
-;    (when (and max-three max-two)
-;      [:full-house (pais-by-num (:original classified-pais) max-three 3)
-;       (pais-by-num (:original classified-pais) max-two 2)])
-;    ))
+(defn full-house-filter
+  "过滤出最大的葫芦"
+  [classified-cards]
+  (let [three (:3 classified-cards)
+        max-three (first three)
+        max-two (or (second three) (first (:2 classified-cards)))
+        original-cards (:original classified-cards)]
+    (when (and max-three max-two)
+      [:full-house (into (pais-by-num original-cards max-three 3)
+                           (pais-by-num original-cards max-two 2))])))
 ;;
 ;;(defn flush-filter
 ;;  "过滤出最大的同花"
@@ -359,7 +360,7 @@
 ;;    (when-not (empty? guess-flush)
 ;;      [:flush (vec (take 5 guess-flush))])))
 ;
-;(defn straight-filter
+;(defn straight-filterÒ
 ;  "过滤出最大的顺子"
 ;  [pais]
 ;  (let [group-by-num (group-by last pais)
