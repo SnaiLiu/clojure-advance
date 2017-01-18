@@ -176,6 +176,17 @@
     nil
     ))
 
+(deftest three-of-a-kind-filter-test
+  (are [cards result]
+    (= (three-of-a-kind-filter cards) result)
+
+    (cards-classify [[:s 14] [:h 13] [:s 13] [:c 13] [:c 9] [:s 8][:c 3]])
+    [:three-of-a-kind [[:h 13] [:s 13] [:c 13] [:s 14] [:c 9]]]
+
+    (cards-classify [[:s 14] [:h 14] [:s 13] [:c 13] [:c 9] [:s 8][:c 3]])
+    nil
+    ))
+
 
 
 

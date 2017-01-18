@@ -371,29 +371,17 @@
         max-straight (max-straight-nums distinct-nums 5)
         original-cards (:original classified-cards)]
     (when max-straight
-      [:straight (reduce #(into % (cards-by-num original-cards %2 1)) [] max-straight)]))
+      [:straight (vec (mapcat #(cards-by-num original-cards % 1) max-straight))])))
 
-
-  #_(let [group-by-num (group-by last pais)
-        guess-straight (->> (mapv #(first (last %)) group-by-num)
-                            (#(sort-by-num % >))
-                            (longest-straight))]
-    (when (>= (count guess-straight) 5)
-      [:straight (vec (take 5 guess-straight))])))
-;
-;(defn three-of-a-kind-filter
-;  "过滤出最大的三同"
-;  [pais]
-;  (let [group-by-num (group-by last pais)
-;        guess-three (->> (filter #(= (count (last %)) 3) group-by-num)
-;                         (sort #(> (first %1) (first %2)))
-;                         first)
-;        guess-two (when guess-three
-;                    (->> (filter #(not= (first guess-three) (last %)) pais)
-;                         (#(sort-by-num % >))
-;                         (take 2)))]
-;    (when-not (empty? guess-two)
-;      [:three-of-a-kind (into (last guess-three) guess-two)])))
+(defn three-of-a-kind-filter
+  "过滤出最大的三同"
+  [classified-cards]
+  (let [max-three (first (:3 classified-cards))
+        max-two-nums (take 2 (:1 classified-cards))
+        original-cards (:original classified-cards)]
+    (when max-three
+      [:three-of-a-kind (into (cards-by-num original-cards max-three 3)
+                              (mapcat #(cards-by-num original-cards % 1) max-two-nums))])))
 ;
 ;(defn two-pairs-filter
 ;  "过滤出最大的两对"
