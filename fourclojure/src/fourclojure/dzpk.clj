@@ -406,20 +406,15 @@
                       vec
                       (into (cards-by-num original-cards max-single-num 1)))])))
 
-;(defn one-pair-filter
-;  "过滤出最大的一对"
-;  [pais]
-;  (let [group-by-num (group-by last pais)
-;        guess-pair (->> (filter #(= (count (last %)) 2) group-by-num)
-;                        (sort #(> (first %1) (first %2)))
-;                        first)
-;
-;        guess-single (when guess-pair
-;                       (->> (filter #(not= (first guess-pair) (last %)) pais)
-;                            (#(sort-by-num % >))
-;                            (take 4)))]
-;    (when guess-single
-;      [:one-pair (into (last guess-pair) guess-single)])))
+(defn one-pair-filter
+  "过滤出最大的一对"
+  [classified-cards]
+  (let [max-pair (first (:2 classified-cards))
+        max-three-singles (take 3 (:1 classified-cards))
+        original-cards (:original classified-cards)]
+    (when (and max-pair max-three-singles)
+      [:one-pair (into (cards-by-num original-cards max-pair 2)
+                       (mapcat #(cards-by-num original-cards % 1) max-three-singles))])))
 ;
 ;(defn high-card-filter
 ;  "过滤出最大的高张"
