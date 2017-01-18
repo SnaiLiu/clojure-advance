@@ -282,14 +282,6 @@
 ;;===============================
 ;; 牌型判断
 
-(defn straight?
-  "判断一手牌是否为顺子"
-  [sorted-nums]
-  (let [count-pais (count sorted-nums)
-        target-nums (take count-pais (iterate dec (first sorted-nums)))]
-    (and (> count-pais 4)
-         (= sorted-nums target-nums))))
-
 (defn max-straight-nums
   "取得最大的连牌, sorted-nums为从大到小排列的牌面值
   n为要获取的连牌张数
@@ -415,13 +407,11 @@
     (when (and max-pair max-three-singles)
       [:one-pair (into (cards-by-num original-cards max-pair 2)
                        (mapcat #(cards-by-num original-cards % 1) max-three-singles))])))
-;
-;(defn high-card-filter
-;  "过滤出最大的高张"
-;  [pais]
-;  [:high-card (->> (sort-by-num pais >)
-;                   (take 5)
-;                   vec)])
+
+(defn high-card-filter
+  "过滤出最大的高张"
+  [classified-cards]
+  [:high-card (take 5 (:original classified-cards))])
 ;
 ;(defn mk-filter
 ;  "构建一个filter"

@@ -217,6 +217,13 @@
     (cards-classify [[:s 14] [:h 13] [:s 12] [:c 11] [:c 9] [:s 8][:c 3]])
     nil))
 
+(deftest high-card-filter-test
+  (are [cards result]
+    (= (high-card-filter cards) result)
+
+    (cards-classify [[:s 14] [:h 13] [:s 12] [:c 10] [:c 9] [:s 8][:c 3]])
+    [:high-card [[:s 14] [:h 13] [:s 12] [:c 10] [:c 9]]]
+    ))
 
 
 
