@@ -96,7 +96,7 @@
 
 (deftest max-straight-cards-test
   (are [sorted-nums n result]
-    (= (max-straight-cards sorted-nums n) result)
+    (= (max-straight-nums sorted-nums n) result)
 
     [9 8 7 6 5 4 3 1] 5 [9 8 7 6 5]
     [9 8 7 5 5 4 3 1] 5 nil
@@ -159,6 +159,20 @@
     [:flush [[:s 14] [:s 10] [:s 8] [:s 7] [:s 6]]]
 
     (cards-classify [[:s 14] [:h 13] [:h 10] [:s 8] [:s 7] [:s 6][:c 3]])
+    nil
+    ))
+
+(deftest straight-filter-test
+  (are [cards result]
+    (= (straight-filter cards) result)
+
+    (cards-classify [[:s 14] [:h 13] [:s 12] [:s 11] [:c 10] [:s 6][:c 3]])
+    [:straight [[:s 14] [:h 13] [:s 12] [:s 11] [:c 10]]]
+
+    (cards-classify [[:s 14] [:h 12] [:s 11] [:s 10] [:c 9] [:s 8][:c 3]])
+    [:straight [[:h 12] [:s 11] [:s 10] [:c 9] [:s 8]]]
+
+    (cards-classify [[:s 14] [:h 12] [:h 10] [:s 10] [:c 9] [:s 8][:c 3]])
     nil
     ))
 

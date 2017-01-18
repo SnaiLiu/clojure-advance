@@ -272,7 +272,7 @@
   [nums color]
   (mapv #(do [color %]) nums))
 
-(defn pais-by-num
+(defn cards-by-num
   "根据牌面数值和所需张数过滤出牌列表"
   [origianl-pais num count]
   (->> (filter #(= num (last %)) origianl-pais)
@@ -290,7 +290,7 @@
     (and (> count-pais 4)
          (= sorted-nums target-nums))))
 
-(defn max-straight-cards
+(defn max-straight-nums
   "取得最大的连牌, sorted-nums为从大到小排列的牌面值
   n为要获取的连牌张数
   没有符合要求的，则返回nil"
@@ -308,7 +308,7 @@
   "过滤出皇家同花顺"
   [classified-cards]
   (let [[color nums] (->> (map #(when-let [max-straight
-                                        (max-straight-cards (get classified-cards %) 5)]
+                                        (max-straight-nums (get classified-cards %) 5)]
                                  (when (= [14 13 12 11 10] max-straight)
                                    [% max-straight]))
                               [:s :h :c :d])
@@ -322,7 +322,7 @@
 (defn straight-flush-filter
   "过滤出最大的同花顺"
   [classified-cards]
-  (let [[color nums] (->> (map #(when-let [straight-cards (max-straight-cards (get classified-cards %) 5)]
+  (let [[color nums] (->> (map #(when-let [straight-cards (max-straight-nums (get classified-cards %) 5)]
                                   [% straight-cards])
                                [:s :h :c :d])
                           (filter #(not (empty? %)))
@@ -349,8 +349,8 @@
         max-two (or (second three) (first (:2 classified-cards)))
         original-cards (:original classified-cards)]
     (when (and max-three max-two)
-      [:full-house (into (pais-by-num original-cards max-three 3)
-                         (pais-by-num original-cards max-two 2))])))
+      [:full-house (into (cards-by-num original-cards max-three 3)
+                         (cards-by-num original-cards max-two 2))])))
 
 (defn flush-filter
   "过滤出最大的同花"
@@ -363,16 +363,23 @@
                           first)]
     (when color
       [:flush (cards-add-color nums color)])))
-;
-;(defn straight-filterÒ
-;  "过滤出最大的顺子"
-;  [pais]
-;  (let [group-by-num (group-by last pais)
-;        guess-straight (->> (mapv #(first (last %)) group-by-num)
-;                            (#(sort-by-num % >))
-;                            (longest-straight))]
-;    (when (>= (count guess-straight) 5)
-;      [:straight (vec (take 5 guess-straight))])))
+
+(defn straight-filter
+  "过滤出最大的顺子"
+  [classified-cards]
+  (let [distinct-nums (sort > (reduce #(into %1 (get classified-cards %2)) [] [:4 :3 :2 :1]))
+        max-straight (max-straight-nums distinct-nums 5)
+        original-cards (:original classified-cards)]
+    (when max-straight
+      [:straight (reduce #(into % (cards-by-num original-cards %2 1)) [] max-straight)]))
+
+
+  #_(let [group-by-num (group-by last pais)
+        guess-straight (->> (mapv #(first (last %)) group-by-num)
+                            (#(sort-by-num % >))
+                            (longest-straight))]
+    (when (>= (count guess-straight) 5)
+      [:straight (vec (take 5 guess-straight))])))
 ;
 ;(defn three-of-a-kind-filter
 ;  "过滤出最大的三同"
