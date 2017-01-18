@@ -230,7 +230,8 @@
 (defn type-cards
   "入口，找出德州扑克7中牌中最大的牌型"
   [cards]
-  (let [converted-cards (convert-cards {:2 2 :3 3 :4 4 :5 5 :6 6 :7 7 :8 8 :9 9 :t 10 :j 11 :q 12 :k 13 :a 14} cards)
-        classified-cards (cards-classify converted-cards)
-        [type resp-cards] (comp-filters classified-cards)]
+  (let [[type resp-cards] (->> cards
+                               (convert-cards {:2 2 :3 3 :4 4 :5 5 :6 6 :7 7 :8 8 :9 9 :t 10 :j 11 :q 12 :k 13 :a 14})
+                               cards-classify
+                               comp-filters)]
     [type (convert-cards {2 :2 3 :3 4 :4 5 :5 6 :6 7 :7 8 :8 9 :9 10 :t 11 :j 12 :q 13 :k 14 :a} resp-cards)]))
