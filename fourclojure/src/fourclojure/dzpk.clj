@@ -84,11 +84,17 @@
 
 (defn flush-type-handler
   "同花类型的牌的处理
-  check-fn接受两个参数：classified-cards 和 color"
+  check-fn接受两个参数：classified-cards 和 color
+  如果有多个花色都满足check-fn要求，则返回拥有最大牌面数值的那一色牌"
   [classified-cards type-id check-fn]
-  (let [[color nums] (->> (map #(check-fn classified-cards %) [:s :h :c :d])
-                          (filter #(not (empty? %)))
-                          first)]
+  (let [type-cards (->> (map #(check-fn classified-cards %) [:s :h :c :d])
+                          (filter #(not (empty? %))))
+        [color nums] (when-not (empty? type-cards)
+                      (reduce (fn [r val]
+                                (if (< (first (last r)) (first (last val)))
+                                  val
+                                  r))
+                              type-cards))]
     (when color
       [type-id (cards-add-color nums color)])))
 
