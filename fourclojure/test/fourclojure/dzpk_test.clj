@@ -22,30 +22,141 @@
 
 (deftest sort-by-num-test
   (are [pais result]
-    (= (sort-by-num pais <) result)
+    (= (sort-by-num  < pais) result)
     [[:s 2] [:s 8] [:s 7] [:d 6] [:d 4]]
     [[:s 2] [:d 4] [:d 6] [:s 7] [:s 8]])
 
   (are [pais result]
-    (= (sort-by-num pais >) result)
+    (= (sort-by-num > pais ) result)
     [[:s 2] [:s 8] [:s 7] [:d 6] [:d 4]]
     [[:s 8] [:s 7] [:d 6] [:d 4] [:s 2]]))
 
 
-(deftest 测试德州扑克最优牌型
-         (are [pais result]
-              (= (paixing pais) result)
-              [[:s :2] [:s :3] [:s :4] [:s :5] [:s :6] [:d :3] [:d :4]]
-              [:straight-flush [[:s :6] [:s :5] [:s :4] [:s :3] [:s :2]]]
+(deftest filter-cards-by-count-test
+  (are [pais t-count result]
+    (= result (filter-cards-by-count pais t-count))
 
-              [[:c :7] [:d :9] [:s :7] [:h :7] [:d :k] [:d :7] [:d :a]]
-              [:4-of-a-kind [[:c :7] [:s :7] [:h :7] [:d :7] [:d :a]]]
+    {4 '(4 4 4 4)
+     3 '(3 3 3)
+     2 '(2 2 )
+     13 '(13)
+     12 '(12)} 4 {:4 '(4)}
 
-              [[:d :q] [:d :j] [:c :j] [:s :j] [:s :q] [:d :8] [:d :t]]
-              [:full-house [[:d :j] [:c :j] [:s :j] [:d :q] [:s :q]]]
+    {4 '(4 4 4 4)
+     3 '(3 3 3)
+     2 '(2 2 )
+     13 '(13)
+     12 '(12)} 3 {:3 '(3)}
 
-              [[:c :3] [:c :9] [:d :t] [:c :j] [:c :8] [:c :q] [:s :t]]
-              [:flush  [[:c :q] [:c :j] [:c :9] [:c :8] [:c :3]]]
+    {4 '(4 4 4 4)
+     3 '(3 3 3)
+     2 '(2 2 )
+     13 '(13)
+     12 '(12)} 2 {:2 '(2)}
 
-              [[:s :7] [:c :6] [:d :8] [:h :5] [:c :4] [:s :8] [:h :8]]
-              [:straight [[:d :8] [:s :7] [:c :6] [:h :5] [:c :4]]]))
+    {4 '(4 4 4 4)
+     3 '(3 3 3)
+     2 '(2 2 )
+     13 '(13)
+     12 '(12)} 1 {:1 '(13 12)}
+    ))
+
+(deftest cards-group-test
+  (are [pais type-fn result]
+    (= (cards-group pais type-fn) result)
+
+    [[:s 4] [:h 4] [:c 4] [:d 4] [:s 3] [:h 3] [:c 3] [:h 2] [:d 2] [:c 13] [:d 12]] first
+    {:s '(4 3)
+     :h '(4 3 2)
+     :c '(13 4 3)
+     :d '(12 4 2)}
+
+    [[:s 4] [:h 4] [:c 4] [:d 4] [:s 3] [:h 3] [:c 3] [:h 2] [:d 2] [:c 13] [:d 12]] last
+    {4 '(4 4 4 4)
+     3 '(3 3 3)
+     2 '(2 2 )
+     13 '(13)
+     12 '(12)}))
+
+(deftest cards-classify-test
+  (are [original-cards result]
+    (= (cards-classify original-cards) result)
+
+    [[:s 4] [:h 4] [:c 4] [:d 4] [:s 3] [:h 3] [:c 3] [:h 2] [:d 2] [:c 13] [:d 12]]
+    {:original [[:s 4] [:h 4] [:c 4] [:d 4] [:s 3] [:h 3] [:c 3] [:h 2] [:d 2] [:c 13] [:d 12]]
+     :s '(4 3)
+     :c '(13 4 3)
+     :h '(4 3 2)
+     :d '(12 4 2)
+     :4 '(4)
+     :3 '(3)
+     :2 '(2)
+     :1 '(13 12)}
+    ))
+
+(deftest max-straight-cards-test
+  (are [sorted-nums n result]
+    (= (max-straight-cards sorted-nums n) result)
+
+    [9 8 7 6 5 4 3 1] 5 [9 8 7 6 5]
+    [9 8 7 5 5 4 3 1] 5 nil
+    ))
+
+
+(deftest royal-flush-filter-test
+  (are [cards result]
+    (= (royal-flush-filter cards) result)
+
+    (cards-classify [[:s 14] [:s 13] [:s 12] [:s 11] [:s 10] [:h 3] [:c 3]])
+    [:royal-flush [[:s 14] [:s 13] [:s 12] [:s 11] [:s 10]]]
+
+    (cards-classify [[:s 14] [:s 12] [:s 10] [:s 9] [:s 8] [:h 3] [:c 3]])
+    nil
+    ))
+
+(deftest straight-flush-filter-test
+  (are [cards result]
+    (= (straight-flush-filter cards) result)
+
+    (cards-classify [[:s 13] [:s 12] [:s 11] [:s 10] [:s 9] [:s 8] [:c 3]])
+    [:straight-flush [[:s 13] [:s 12] [:s 11] [:s 10] [:s 9]]]
+    (cards-classify [[:s 13] [:s 12] [:s 10] [:h 10] [:s 9] [:s 8] [:c 3]])
+    nil
+    ))
+
+(deftest four-of-a-kind-filter-test
+  (are [cards result]
+    (= (four-of-a-kind-filter cards) result)
+
+    (cards-classify [[:d 14] [:s 13] [:d 13] [:c 13] [:h 13] [:s 9][:c 3]])
+    [:4-of-a-kind [[:s 13] [:c 13] [:h 13] [:d 13] [:d 14]]]
+
+    (cards-classify [[:d 14] [:s 13] [:d 13] [:c 13] [:h 12] [:s 9][:c 3]])
+    nil
+    ))
+
+
+
+
+
+
+
+
+
+;(deftest 测试德州扑克最优牌型
+;         (are [pais result]
+;              (= (paixing pais) result)
+;              [[:s :2] [:s :3] [:s :4] [:s :5] [:s :6] [:d :3] [:d :4]]
+;              [:straight-flush [[:s :6] [:s :5] [:s :4] [:s :3] [:s :2]]]
+;
+;              [[:c :7] [:d :9] [:s :7] [:h :7] [:d :k] [:d :7] [:d :a]]
+;              [:4-of-a-kind [[:c :7] [:s :7] [:h :7] [:d :7] [:d :a]]]
+;
+;              [[:d :q] [:d :j] [:c :j] [:s :j] [:s :q] [:d :8] [:d :t]]
+;              [:full-house [[:d :j] [:c :j] [:s :j] [:d :q] [:s :q]]]
+;
+;              [[:c :3] [:c :9] [:d :t] [:c :j] [:c :8] [:c :q] [:s :t]]
+;              [:flush  [[:c :q] [:c :j] [:c :9] [:c :8] [:c :3]]]
+;
+;              [[:s :7] [:c :6] [:d :8] [:h :5] [:c :4] [:s :8] [:h :8]]
+;              [:straight [[:d :8] [:s :7] [:c :6] [:h :5] [:c :4]]]))
