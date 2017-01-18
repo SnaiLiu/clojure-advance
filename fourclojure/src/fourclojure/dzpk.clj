@@ -260,9 +260,9 @@
         count-three (filter-cards-by-count grouped-by-number 3)
         count-two (filter-cards-by-count grouped-by-number 2)
         count-one (filter-cards-by-count grouped-by-number 1)]
-    (merge {:original original-cards} grouped-by-color count-four count-three count-two count-one)))
+    (merge {:original (sort-by-num > original-cards)} grouped-by-color count-four count-three count-two count-one)))
 
-(defn convert-pais
+(defn convert-cards
   "牌型显示形式与程序内部表现形式转换"
   [cards-dict cards]
   (mapv #(assoc % 1 (cards-dict (second %))) cards))
@@ -412,39 +412,42 @@
   "过滤出最大的高张"
   [classified-cards]
   [:high-card (take 5 (:original classified-cards))])
-;
-;(defn mk-filter
-;  "构建一个filter"
-;  [filter-fn]
-;  (fn [[type pais]]
-;    (if type
-;      [type pais]
-;      (if-let [type-pai (filter-fn pais)]
-;        type-pai
-;        [nil pais]))))
-;
-;(defn comp-filters
-;  "构建大筛子，从大到小牌型进行组装"
-;  [pais]
-;  (->> [nil pais]
-;       ((mk-filter royal-flush-filter))
-;       ((mk-filter straight-flush-filter))
-;       ((mk-filter four-of-a-kind-filter))
-;       ((mk-filter full-house-filter))
-;       ;((mk-filter flush-filter))
-;       ((mk-filter straight-filter))
-;       ((mk-filter three-of-a-kind-filter))
-;       ((mk-filter two-pairs-filter))
-;       ((mk-filter one-pair-filter))
-;       ((mk-filter high-card-filter))))
-;
-;;;=============================
-;(defn paixing
-;  "入口，找出德州扑克7中牌中最大的牌型"
-;  [pais]
-;  (let [converted-pais (convert-pais {:2 2 :3 3 :4 4 :5 5 :6 6 :7 7 :8 8 :9 9 :t 10 :j 11 :q 12 :k 13 :a 14} pais)
-;        [type paixing-pais] (comp-filters converted-pais)]
-;    [type (convert-pais {2 :2 3 :3 4 :4 5 :5 6 :6 7 :7 8 :8 9 :9 10 :t 11 :j 12 :q 13 :k 14 :a} paixing-pais)]))
-;
+
+(defn mk-filter
+  "构建一个filter"
+  [filter-fn]
+  (fn [[type cards]]
+    (if type
+      [type cards]
+      (if-let [type-card (filter-fn cards)]
+        type-card
+        [nil cards]))))
+
+(defn comp-filters
+  "构建大筛子，从大到小牌型进行组装"
+  [classified-cards]
+  (->> [nil classified-cards]
+       ((mk-filter royal-flush-filter))
+       ((mk-filter straight-flush-filter))
+       ((mk-filter four-of-a-kind-filter))
+       ((mk-filter full-house-filter))
+       ((mk-filter flush-filter))
+       ((mk-filter straight-filter))
+       ((mk-filter three-of-a-kind-filter))
+       ((mk-filter two-pairs-filter))
+       ((mk-filter one-pair-filter))
+       ((mk-filter high-card-filter))))
+
+;;=============================
+(defn type-cards
+  "入口，找出德州扑克7中牌中最大的牌型"
+  [cards]
+  (let [converted-cards (convert-cards {:2 2 :3 3 :4 4 :5 5 :6 6 :7 7 :8 8 :9 9 :t 10 :j 11 :q 12 :k 13 :a 14} cards)
+        _ (prn "converted-cards == " converted-cards)
+        classified-cards (cards-classify converted-cards)
+        _ (prn "classified-cards == " classified-cards)
+        [type resp-cards] (comp-filters classified-cards)]
+    [type (convert-cards {2 :2 3 :3 4 :4 5 :5 6 :6 7 :7 8 :8 9 :9 10 :t 11 :j 12 :q 13 :k 14 :a} resp-cards)]))
+
 
 ;===============================================================
