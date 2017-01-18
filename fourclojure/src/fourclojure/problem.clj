@@ -497,7 +497,3 @@
   (lazy-seq
     (when-let [s (seq coll)]
       (cons (f (first s)) (my-map f (rest s))))))
-
-(defn __
-  [a b & c]
-  )
