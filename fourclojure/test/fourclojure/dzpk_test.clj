@@ -148,6 +148,20 @@
     (cards-classify [[:s 13] [:d 13] [:c 13] [:h 12] [:d 11] [:s 9][:c 3]])
     nil))
 
+(deftest flush-filter-test
+  (are [cards result]
+    (= (flush-filter cards) result)
+
+    (cards-classify [[:s 14] [:s 13] [:s 10] [:s 8] [:s 7] [:s 6][:c 3]])
+    [:flush [[:s 14] [:s 13] [:s 10] [:s 8] [:s 7]]]
+
+    (cards-classify [[:s 14] [:h 13] [:s 10] [:s 8] [:s 7] [:s 6][:c 3]])
+    [:flush [[:s 14] [:s 10] [:s 8] [:s 7] [:s 6]]]
+
+    (cards-classify [[:s 14] [:h 13] [:h 10] [:s 8] [:s 7] [:s 6][:c 3]])
+    nil
+    ))
+
 
 
 

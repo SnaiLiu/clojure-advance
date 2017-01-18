@@ -350,15 +350,19 @@
         original-cards (:original classified-cards)]
     (when (and max-three max-two)
       [:full-house (into (pais-by-num original-cards max-three 3)
-                           (pais-by-num original-cards max-two 2))])))
-;;
-;;(defn flush-filter
-;;  "过滤出最大的同花"
-;;  [pais]
-;;  (let [group-by-color (group-by first pais)
-;;        guess-flush (guess-flush group-by-color)]
-;;    (when-not (empty? guess-flush)
-;;      [:flush (vec (take 5 guess-flush))])))
+                         (pais-by-num original-cards max-two 2))])))
+
+(defn flush-filter
+  "过滤出最大的同花"
+  [classified-cards]
+  (let [[color nums] (->> (map #(when-let [flush-nums (take 5 (get classified-cards %))]
+                                  (when (= 5 (count flush-nums))
+                                    [% flush-nums]))
+                               [:s :h :c :d])
+                          (filter #(not (empty? %)))
+                          first)]
+    (when color
+      [:flush (cards-add-color nums color)])))
 ;
 ;(defn straight-filterÒ
 ;  "过滤出最大的顺子"
