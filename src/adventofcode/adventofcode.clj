@@ -1,4 +1,4 @@
-(ns clojure-study.adventofcode
+(ns adventofcode.adventofcode
   "网站 http://adventofcode.com 的练习题")
 
 (defn inverse-captcha
@@ -248,7 +248,7 @@
     (with-open [^java.io.BufferedReader rdr (clojure.java.io/reader file-path :encoding "UTF-8")]
       (count-fn (line-seq rdr))))
 
-  (count-from-file "src/clojure_study/adventofcodeinputs/high_entropy_passphrases.txt"
+  (count-from-file "src/adventofcode/adventofcodeinputs/high_entropy_passphrases.txt"
                    valid-passphrase-count)
   ;; => 466
   )
@@ -280,6 +280,6 @@
 
 (comment
   (advanced-valid-passphrase-count ["abcde fghij" "abcde xyz ecdab"]) ;;=> 1
-  (count-from-file "src/clojure_study/adventofcodeinputs/high_entropy_passphrases.txt"
+  (count-from-file "src/adventofcode/adventofcodeinputs/high_entropy_passphrases.txt"
                    advanced-valid-passphrase-count) ;;=> 251
   )
