@@ -285,7 +285,7 @@
   )
 
 (defn escape-steps
-  "--- Day 5: A Maze of Twisty Trampolines, All Alike ---
+  "--- Day 5: A Maze of Twisty Trampolines, All Alike (Part One)---
    The message includes a list of the offsets for each jump. Jumps are relative: -1
    moves to the previous instruction, and 2 skips the next one. Start at the first
    instruction in the list. The goal is to follow the jumps until one leads outside the list.
@@ -313,7 +313,6 @@
    ------------------------------------------------------"
   [instructions]
   (loop [pos 0 steps 0 ins instructions]
-    (prn "steps = " steps)
     (if (or (>= pos (count ins)) (< pos 0))
       steps
       (recur (+ pos (get ins pos))
@@ -326,4 +325,33 @@
                    (fn [lines]
                      (let [instructions (mapv #(Long/parseLong %) lines)]
                        (escape-steps instructions)))) ;;=> 376976
+  )
+
+(defn advanced-escape-steps
+  "--- Day 5: A Maze of Twisty Trampolines, All Alike (Part Two)---
+   Now, the jumps are even stranger: after each jump, if the offset was
+   three or more, instead decrease it by 1. Otherwise, increase it by 1
+   as before.
+
+   Using this rule with the above example, the process now takes 10 steps,
+   and the offset values after finding the exit are left as 2 3 2 3 -1.
+   How many steps does it now take to reach the exit?
+   ----------------------------------------------------------------"
+  [instructions]
+  (loop [pos 0 steps 0 ins instructions]
+    (if (or (>= pos (count ins)) (< pos 0))
+      steps
+      (recur (+ pos (get ins pos))
+             (inc steps)
+             (update ins pos (fn [number]
+                               (if (>= number 3)
+                                 (dec number)
+                                 (inc number))))))))
+
+(comment
+  (advanced-escape-steps [0 3 0 1 -3]) ;;=> 10
+  (count-from-file "src/adventofcode/adventofcodeinputs/escape_steps.txt"
+                   (fn [lines]
+                     (let [instructions (mapv #(Long/parseLong %) lines)]
+                       (advanced-escape-steps instructions)))) ;;=> 376976
   )
