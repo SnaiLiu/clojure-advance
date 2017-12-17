@@ -1,5 +1,5 @@
-(ns adventofcode.adventofcode
-  "网站 http://adventofcode.com 的练习题")
+(ns adventofcode.adventofcode_day1_5
+  "The Day1 to Day5 exercises from http://adventofcode.com")
 
 (defn inverse-captcha
   "--- Day 1: Inverse Captcha ---
