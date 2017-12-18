@@ -125,7 +125,6 @@
                                  [1 [1 1]])
           [circle [start end]] (find-some #(<= (first (second %)) number (second (second %)))
                                           circles-range)
-          _ (prn "circle start end = " circle start end)
           half-side-len (- circle 1)
           offset-len    (mod (inc (- number start)) (* 2 half-side-len))
           step1 (Math/abs (- offset-len half-side-len))]
