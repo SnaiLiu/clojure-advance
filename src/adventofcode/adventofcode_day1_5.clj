@@ -125,6 +125,27 @@
                                  [1 [1 1]])
           [circle [start end]] (find-some #(<= (first (second %)) number (second (second %)))
                                           circles-range)
+          _ (prn "circle start end = " circle start end)
+          half-side-len (- circle 1)
+          offset-len    (mod (inc (- number start)) (* 2 half-side-len))
+          step1 (Math/abs (- offset-len half-side-len))]
+      (+ step1 (dec circle)))))
+
+(defn advanced-steps-checksum
+  "--- Day 3: Spiral Memory (Part One)---
+   --------------------------------------
+   This is another solution, with quiker algorithm to find the circle."
+  [number]
+  (if (= number 1)
+    0
+    (let [pow (fn [x] (* x x))
+          sqrt-num (Math/sqrt number)
+          max-num  (/ (+ sqrt-num 3) 2)
+          min-num (/ (+ sqrt-num 1) 2)
+          circle (first (filter #(and (<= min-num %) (< % max-num))
+                                [(int max-num) (int min-num)]))
+          end (pow (- (* 2 circle) 1))
+          start (+ 1 (pow (- (* 2 circle) 3)))
           half-side-len (- circle 1)
           offset-len    (mod (inc (- number start)) (* 2 half-side-len))
           step1 (Math/abs (- offset-len half-side-len))]
@@ -135,6 +156,10 @@
   (steps-checksum 12) ;;=> 3
   (steps-checksum 23) ;;=> 2
   (steps-checksum 1024) ;;=> 31
+  (advanced-steps-checksum 1) ;;=> 0
+  (advanced-steps-checksum 12) ;;=> 3
+  (advanced-steps-checksum 23) ;;=> 2
+  (advanced-steps-checksum 1024) ;;=> 31
   )
 
 (defn first-larger-number
