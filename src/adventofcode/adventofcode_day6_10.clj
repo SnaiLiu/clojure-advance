@@ -1,25 +1,50 @@
-(ns adventofcode.adventofcode-day6-10)
+(ns adventofcode.adventofcode-day6-10
+  (:require [adventofcode.utils :as u]))
 
-(defn reallocation
+(defn reallocation-deltas
   "Find the reallocation solution: the delta of the positions, which
   should be reallocated. Return a list:
   '([position delta] ...)"
   [max-pos max-val banks-count]
-  (prn "max-pos max-val banks-count = " max-pos max-val banks-count)
   (let [last-pos (dec banks-count)
         remain-len (- last-pos max-pos)
-        other-remain-len (- max-val remain-len)
-        first-row (range (inc max-pos) (min banks-count (+ max-pos max-val 1)))
-        circle (int (/ other-remain-len banks-count))
-        last-row (range 0 (mod other-remain-len banks-count))
-        pos-count (group-by identity (concat first-row last-row))]
-    (if (> circle 0)
-      (map #(do [% (+ circle (count (get pos-count %)))])
-           (range 0 banks-count))
-      (map #(do [(first %) (count (last %))]) pos-count))))
+        other-remain-len (- max-val remain-len)]
+    (if (<= other-remain-len 0)
+      (map #(do [% 1]) (range (inc max-pos)
+                              (+ max-pos max-val 1)))
+      (let [m (mod other-remain-len banks-count)
+            circle (int (/ other-remain-len banks-count))
+            after-concat (concat (range (inc max-pos) banks-count)
+                                 (range 0 m))
+            pos-count (group-by identity after-concat)]
+        (if (> circle 0)
+          (map #(do [% (+ circle (count (get pos-count %)))])
+               (range 0 banks-count))
+          (map #(do [(first %) (count (last %))]) pos-count))))))
+
+(defn reallocation-builder
+  "The builder to build the process of the reallocation.
+   Save the step number and its reallocation result."
+  [banks]
+  (let [banks-count (count banks)
+        indexed-banks (vec (map-indexed #(do [%1 %2]) banks))
+        find-max (fn [indexed-banks] (first (sort-by second > indexed-banks)))]
+    (iterate (fn [{:keys [step indexed-banks histories] :as recorder}]
+               (let [[max-pos max-val] (find-max indexed-banks)
+                     banks (assoc indexed-banks max-pos [max-pos 0])
+                     reallocate-deltas (reallocation-deltas max-pos max-val banks-count)
+                     new-banks (reduce (fn [b [pos delta]]
+                                         (update b pos (fn [[p v]]
+                                                         [p (+ v delta)])))
+                                       banks reallocate-deltas)]
+                 (-> (update-in recorder [:histories indexed-banks] (fnil conj []) step)
+                     (assoc :step (inc step) :indexed-banks new-banks))))
+             {:histories {}
+              :step      0
+              :indexed-banks indexed-banks})))
 
 (defn reallocate-steps
-  "--- Day 6: Memory Reallocation ---
+  "--- Day 6: Memory Reallocation (Part One) ---
   In this area, there are sixteen memory banks; each memory bank can hold any number of blocks.
   The goal of the reallocation routine is to balance the blocks between the memory banks.
   The reallocation routine operates in cycles. In each cycle, it finds the memory bank with the
@@ -55,22 +80,32 @@
   completed before a configuration is produced that has been seen before?
   ------------------------------------------------"
   [banks]
-  (let [banks-count (count banks)
-        indexed-banks (vec (map-indexed #(do [%1 %2]) banks))
-        find-max (fn [indexed-banks] (first (sort-by second > indexed-banks)))]
-    (loop [steps 1 banks indexed-banks history #{}]
-      (let [[max-pos max-val] (find-max banks)
-            banks (assoc banks max-pos [max-pos 0])
-            reallocate-deltas (reallocation max-pos max-val banks-count)
-            new-banks (reduce (fn [b [pos delta]]
-                                (update b pos (fn [[p v]]
-                                                [p (+ v delta)])))
-                              banks reallocate-deltas)]
-        (if (history new-banks)
-          steps
-          (recur (inc steps) new-banks (conj history new-banks)))))))
+  (-> (u/find-some #(identity (get (:histories %) (:indexed-banks %)))
+                   (reallocation-builder banks))
+      :step))
 
 (comment
   (reallocate-steps [0 2 7 0]) ;;=> 5
   (reallocate-steps [4 10 4 1 8 4 9 14 5 1 14 15 0 15 3 5]) ;;=> 12841
+  )
+
+(defn see-again-steps
+  "--- Day 6: Memory Reallocation (Part Two) ---
+   Out of curiosity, the debugger would also like to know the size of the loop:
+   starting from a state that has already been seen, how many block redistribution
+   cycles must be performed before that same state is seen again?
+   In the example above, 2 4 1 2 is seen again after four cycles, and so the answer
+   in that example would be 4.
+
+   How many cycles are in the infinite loop that arises from the configuration
+   in your puzzle input?
+   ----------------------------------"
+  [banks]
+  (let [{:keys [step indexed-banks histories]}
+        (u/find-some #(identity (get (:histories %) (:indexed-banks %)))
+                     (reallocation-builder banks))]
+    (- step (first (get histories indexed-banks)))))
+
+(comment
+  (see-again-steps [4 10 4 1 8 4 9 14 5 1 14 15 0 15 3 5]) ;;=> 8038
   )
