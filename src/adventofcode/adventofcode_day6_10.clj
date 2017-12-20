@@ -5,21 +5,18 @@
   should be reallocated. Return a list:
   '([position delta] ...)"
   [max-pos max-val banks-count]
+  (prn "max-pos max-val banks-count = " max-pos max-val banks-count)
   (let [last-pos (dec banks-count)
         remain-len (- last-pos max-pos)
-        other-remain-len (- max-val remain-len)]
-    (if (<= other-remain-len 0)
-      (map #(do [% 1]) (range (inc max-pos)
-                              (+ max-pos max-val 1)))
-      (let [m (mod other-remain-len banks-count)
-            circle (int (/ other-remain-len banks-count))
-            after-concat (concat (range (inc max-pos) banks-count)
-                                 (range 0 m))
-            pos-count (group-by identity after-concat)]
-        (if (> circle 0)
-          (map #(do [% (+ circle (count (get pos-count %)))])
-               (range 0 banks-count))
-          (map #(do [(first %) (count (last %))]) pos-count))))))
+        other-remain-len (- max-val remain-len)
+        first-row (range (inc max-pos) (min banks-count (+ max-pos max-val 1)))
+        circle (int (/ other-remain-len banks-count))
+        last-row (range 0 (mod other-remain-len banks-count))
+        pos-count (group-by identity (concat first-row last-row))]
+    (if (> circle 0)
+      (map #(do [% (+ circle (count (get pos-count %)))])
+           (range 0 banks-count))
+      (map #(do [(first %) (count (last %))]) pos-count))))
 
 (defn reallocate-steps
   "--- Day 6: Memory Reallocation ---
@@ -74,5 +71,6 @@
           (recur (inc steps) new-banks (conj history new-banks)))))))
 
 (comment
+  (reallocate-steps [0 2 7 0]) ;;=> 5
   (reallocate-steps [4 10 4 1 8 4 9 14 5 1 14 15 0 15 3 5]) ;;=> 12841
   )
