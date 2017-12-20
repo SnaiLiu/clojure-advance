@@ -1,8 +1,22 @@
 (ns adventofcode.adventofcode_day1_5
-  "The Day1 to Day5 exercises from http://adventofcode.com")
+  "The Day1 to Day5 exercises from http://adventofcode.com"
+  (:require [adventofcode.utils :as u]))
+
+(defn captcha-sum-by-step
+  "Calculate the sum of the digits, which if the digit `step` steps forward matches it."
+  [captcha step]
+  (let [captcha-seq      (vec (seq captcha))
+        captcha-len (count captcha-seq)
+        match-pos (fn [start] (mod (+ start step) captcha-len))]
+    (reduce (fn [sum pos]
+              (if (= (get captcha-seq pos)
+                     (get captcha-seq (mod (+ pos step) captcha-len)))
+                (+ sum (Long/parseLong (str (get captcha-seq pos))))
+                sum))
+            0 (range 0 captcha-len))))
 
 (defn inverse-captcha
-  "--- Day 1: Inverse Captcha ---
+  "--- Day 1: Inverse Captcha (Part One)---
    The captcha requires you to review a sequence of digits (your puzzle input)
    and find the sum of all digits that match the next digit in the list. The
    list is circular, so the digit after the last digit is the first digit in the list.
@@ -14,16 +28,26 @@
    91212129 produces 9 because the only digit that matches the next one is the last digit, 9.
    ------------------------------------------------"
   [captcha]
-  (let [captcha-seq (seq captcha)
-        captcha-circular (concat captcha-seq (take 1 captcha-seq))]
-    (loop [sum 0
-           s captcha-circular]
-      (if (<= (count s) 1)
-        sum
-        (recur (if (= (first s) (second s))
-                    (+ sum (Long/parseLong (str (first s))))
-                    sum)
-               (rest s))))))
+  (captcha-sum-by-step captcha 1))
+
+(defn halfway-captcha
+  "--- Day 1: Inverse Captcha (Part Two)---
+   Now, instead of considering the next digit, it wants you to consider the digit
+   halfway around the circular list. That is, if your list contains 10 items,
+    only include a digit in your sum if the digit 10/2 = 5 steps forward matches
+    it. Fortunately, your list has an even number of elements.
+    For example:
+    - 1212 produces 6: the list contains 4 items, and all four digits match the
+      digit 2 items ahead.
+    - 1221 produces 0, because every comparison is between a 1 and a 2.
+    - 123425 produces 4, because both 2s match each other, but no other digit
+      has a match.
+    - 123123 produces 12.
+    - 12131415 produces 4.
+    What is the solution to your new captcha?
+    -------------------------------------------"
+  [captcha]
+  (captcha-sum-by-step captcha (/ (count captcha) 2)))
 
 (comment
   (inverse-captcha "") ;; => 0
@@ -32,6 +56,10 @@
   (inverse-captcha "1111") ;; => 4
   (inverse-captcha "1234") ;; => 0
   (inverse-captcha "91212129") ;; => 9
+  (halfway-captcha "123123") ;;=> 12
+  (halfway-captcha "12131415") ;;=> 4
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day1.txt"
+                      #(halfway-captcha (first %)))
   )
 
 (defn row-difference-checksum
@@ -56,14 +84,6 @@
   (row-difference-checksum [[5 1 9 5] [7 5 3] [2 4 6 8]]) ;; => 18
   )
 
-(defn find-some
-  "find the first item in the coll, which match the pred."
-  [pred coll]
-  (when (seq coll)
-    (if (pred (first coll))
-      (first coll)
-      (recur pred (next coll)))))
-
 (defn row-divide-checksum
   "--- Day 2: Corruption Checksum (Part Two)---
    the goal is to find the only two numbers in each row where one evenly divides the
@@ -84,7 +104,7 @@
   (let [row-result (fn [sorted-row]
                      (loop [row sorted-row]
                        (if (seq row)
-                         (if-let [hit (find-some #(int? (/ % (first row))) (next row))]
+                         (if-let [hit (u/find-some #(int? (/ % (first row))) (next row))]
                            (/ hit (first row))
                            (recur (next row)))
                          0)))]
@@ -123,7 +143,7 @@
     (let [circles-range (iterate (fn [[circle-index [start end]]]
                                    [(inc circle-index) [(inc end) (+ end (* circle-index 8))]])
                                  [1 [1 1]])
-          [circle [start end]] (find-some #(<= (first (second %)) number (second (second %)))
+          [circle [start end]] (u/find-some #(<= (first (second %)) number (second (second %)))
                                           circles-range)
           half-side-len (- circle 1)
           offset-len    (mod (inc (- number start)) (* 2 half-side-len))
@@ -219,7 +239,7 @@
                                      {:square  [[0 0] 1]
                                       :squares {[0 0] 1}
                                       :circle  [0 0 0 0]})]
-    (-> (find-some #(> (last (:square %)) number) all-squares)
+    (-> (u/find-some #(> (last (:square %)) number) all-squares)
         :square
         last)))
 
@@ -266,15 +286,8 @@
   (valid-passphrase-count ["1 1" "2"]) ;;=> 1
   (valid-passphrase-count2 ["1 1" "2"]) ;;=> 1
 
-  (defn count-from-file
-    "工具函数"
-    [file-path count-fn]
-    (with-open [^java.io.BufferedReader rdr (clojure.java.io/reader file-path :encoding "UTF-8")]
-      (count-fn (line-seq rdr))))
-
-  (count-from-file "src/adventofcode/adventofcodeinputs/high_entropy_passphrases.txt"
-                   valid-passphrase-count)
-  ;; => 466
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day4.txt"
+                      valid-passphrase-count) ;; => 466
   )
 
 (defn advanced-valid-passphrase-count
@@ -304,8 +317,8 @@
 
 (comment
   (advanced-valid-passphrase-count ["abcde fghij" "abcde xyz ecdab"]) ;;=> 1
-  (count-from-file "src/adventofcode/adventofcodeinputs/high_entropy_passphrases.txt"
-                   advanced-valid-passphrase-count) ;;=> 251
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day4.txt"
+                      advanced-valid-passphrase-count) ;;=> 251
   )
 
 (defn escape-steps
@@ -345,7 +358,7 @@
 
 (comment
   (escape-steps [0 3 0 1 -3]) ;;=> 5
-  (count-from-file "src/adventofcode/adventofcodeinputs/escape_steps.txt"
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day5.txt"
                    (fn [lines]
                      (let [instructions (mapv #(Long/parseLong %) lines)]
                        (escape-steps instructions)))) ;;=> 376976
@@ -374,8 +387,8 @@
 
 (comment
   (advanced-escape-steps [0 3 0 1 -3]) ;;=> 10
-  (count-from-file "src/adventofcode/adventofcodeinputs/escape_steps.txt"
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day5.txt"
                    (fn [lines]
                      (let [instructions (mapv #(Long/parseLong %) lines)]
-                       (advanced-escape-steps instructions)))) ;;=> 376976
+                       (advanced-escape-steps instructions)))) ;;=> 29227751
   )
