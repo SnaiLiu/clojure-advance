@@ -126,7 +126,7 @@
           {} programs))
 
 (defn bottom-program
-  "---- Day 7: Recursive Circus ---
+  "---- Day 7: Recursive Circus (Part One)---
    first you need to understand the structure of these towers. You ask each program
    to yell out their name, their weight, and (if they're holding a disc) the names of
    the programs immediately above them balancing on that disc. You write this information
@@ -185,30 +185,65 @@
      ...}
     "
   [programs]
-  (->> (tower-paths-builder programs)
+  (->> (tower-paths-builder (vals programs))
        (filter #(= (first %) (first (last %))))
        ffirst))
+
+(defn weight-for-balance
+  "---- Day 7: Recursive Circus (Part Two)---
+   For any program holding a disc, each program standing on that disc forms a sub-tower.
+   Each of those sub-towers are supposed to be the same weight, or the disc itself isn't
+   balanced. The weight of a tower is the sum of the weights of the programs in that tower.
+
+   In the example above, this means that for ugml's disc to be balanced, gyxo, ebii, and
+   jptl must all have the same weight, and they do: 61.
+   However, for tknk to be balanced, each of the programs standing on its disc and all
+   programs above it must each match. This means that the following sums must all be the same:
+   ugml + (gyxo + ebii + jptl) = 68 + (61 + 61 + 61) = 251
+   padx + (pbga + havc + qoyq) = 45 + (66 + 66 + 66) = 243
+   fwft + (ktlj + cntj + xhth) = 72 + (57 + 57 + 57) = 243
+   As you can see, tknk's disc is unbalanced: ugml's stack is heavier than the other two.
+   Even though the nodes above ugml are balanced, ugml itself is too heavy: it needs to
+   be 8 units lighter for its stack to weigh 243 and keep the towers balanced. If this change
+   were made, its weight would be 60.
+   Given that exactly one program is the wrong weight, what would its weight need to be to
+   balance the entire tower?
+   -------------------------------------------
+   input programs:
+   {\"name\" {:name \"name\"
+              :weight 90
+              :sub-programs [\"name1\" \"name2\"]}
+    ...}"
+  [programs]
+  (let [tower-paths (tower-paths-builder (vals programs))]
+
+
+    )
+  )
 
 (comment
   (defn input-converse
     [handler]
     (fn [lines]
       (let [programs
-            (mapv (fn [line]
-                    (let [arr          (clojure.string/split line #" ")
-                          name         (first arr)
-                          weight       (when-let [w-str (second arr)]
-                                         (Long/parseLong (second (re-find #"\((\d+)\)$" w-str))))
-                          sub-programs (when-let [sub-strs (next (nnext arr))]
-                                         (->> (map (fn [sub-name]
-                                                     (if-let [n (second (re-find #"^(.+),$" sub-name))]
-                                                       n
-                                                       sub-name)) sub-strs)
-                                              (filter identity)))]
-                      {:name name :weight weight :sub-programs sub-programs}))
-                  lines)]
+            (->> (mapv (fn [line]
+                         (let [arr          (clojure.string/split line #" ")
+                               name         (first arr)
+                               weight       (when-let [w-str (second arr)]
+                                              (Long/parseLong (second (re-find #"\((\d+)\)$" w-str))))
+                               sub-programs (when-let [sub-strs (next (nnext arr))]
+                                              (->> (map (fn [sub-name]
+                                                          (if-let [n (second (re-find #"^(.+),$" sub-name))]
+                                                            n
+                                                            sub-name)) sub-strs)
+                                                   (filter identity)))]
+                           [name {:name name :weight weight :sub-programs sub-programs}]))
+                       lines)
+                 (into {}))]
         (handler programs))))
 
   (u/handle-from-file "src/adventofcode/adventofcodeinputs/day7.txt"
+                      (input-converse bottom-program))
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day7_1.txt"
                       (input-converse bottom-program))
   )
