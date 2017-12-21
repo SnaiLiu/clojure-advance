@@ -109,3 +109,106 @@
 (comment
   (see-again-steps [4 10 4 1 8 4 9 14 5 1 14 15 0 15 3 5]) ;;=> 8038
   )
+
+(defn tower-paths-builder
+  "Build the path of each name.
+  The return likes below:
+  {\"name\" [\"parent-name\" \"name\"]}"
+  [programs]
+  (reduce (fn [p {:keys [name sub-programs] :as program}]
+            (let [parent-path (get p name)
+                  set-self    (if (get p name) p (assoc p name [name]))
+                  set-subs    (reduce (fn [m sub-name]
+                                        (assoc m sub-name
+                                                 (concat (get set-self name) [sub-name])))
+                                      set-self sub-programs)]
+              set-subs))
+          {} programs))
+
+(defn bottom-program
+  "---- Day 7: Recursive Circus ---
+   first you need to understand the structure of these towers. You ask each program
+   to yell out their name, their weight, and (if they're holding a disc) the names of
+   the programs immediately above them balancing on that disc. You write this information
+   down (your puzzle input). Unfortunately, in their panic, they don't do this in an orderly
+    fashion; by the time you're done, you're not sure which program gave which information.
+    For example, if your list is the following:
+    pbga (66)
+    xhth (57)
+    ebii (61)
+    havc (66)
+    ktlj (57)
+    fwft (72) -> ktlj, cntj, xhth
+    qoyq (66)
+    padx (45) -> pbga, havc, qoyq
+    tknk (41) -> ugml, padx, fwft
+    jptl (61)
+    ugml (68) -> gyxo, ebii, jptl
+    gyxo (61)
+    cntj (57)
+    ...then you would be able to recreate the structure of the towers that looks like this:
+                    gyxo
+                  /
+             ugml - ebii
+           /      \\
+          |        jptl
+          |
+          |        pbga
+         /        /
+    tknk --- padx - havc
+         \\        \\
+          |         qoyq
+          |
+          |         ktlj
+           \\      /
+              fwft - cntj
+                   \\
+                    xhth
+    In this example, tknk is at the bottom of the tower (the bottom program), and is holding
+    up ugml, padx, and fwft. Those programs are, in turn, holding up other programs; in this
+    example, none of those programs are holding up any other programs, and are all the tops
+    of their own towers. (The actual tower balancing in front of you is much larger.)
+
+    Before you're ready to help them, you need to make sure your information is correct. What
+    is the name of the bottom program?
+    ----------------------------------
+    each program structure like below:
+
+    {:name \"fwft\"
+     :weight 72
+     :sub-programs #{ktlj cntj xhth}
+     }
+
+    the path of each program:
+    {\"ktlj\" [\"fwft\" \"ktlj\"]
+     \"cntj\" [\"fwft\" \"cntj\"]
+     ...}
+    "
+  [programs]
+  (->> (tower-paths-builder programs)
+       (filter #(= (first %) (first (last %))))
+       ffirst))
+
+(comment
+  (defn input-converse
+    [handler]
+    (fn [lines]
+      (let [programs
+            (mapv (fn [line]
+                    (let [arr          (clojure.string/split line #" ")
+                          name         (first arr)
+                          weight       (when-let [w-str (second arr)]
+                                         (Long/parseLong (second (re-find #"\((\d+)\)$" w-str))))
+                          sub-programs (when-let [sub-strs (next (nnext arr))]
+                                         (->> (map (fn [sub-name]
+                                                     (if-let [n (second (re-find #"^(.+),$" sub-name))]
+                                                       n
+                                                       sub-name)) sub-strs)
+                                              (filter identity)))]
+                      {:name name :weight weight :sub-programs sub-programs}))
+                  lines)]
+        (handler programs))))
+
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day7.txt"
+                      (input-converse bottom-program))
+  )
