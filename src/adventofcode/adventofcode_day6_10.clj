@@ -6,17 +6,17 @@
   should be reallocated. Return a list:
   '([position delta] ...)"
   [max-pos max-val banks-count]
-  (let [last-pos (dec banks-count)
-        remain-len (- last-pos max-pos)
+  (let [last-pos         (dec banks-count)
+        remain-len       (- last-pos max-pos)
         other-remain-len (- max-val remain-len)]
     (if (<= other-remain-len 0)
       (map #(do [% 1]) (range (inc max-pos)
                               (+ max-pos max-val 1)))
-      (let [m (mod other-remain-len banks-count)
-            circle (int (/ other-remain-len banks-count))
+      (let [m            (mod other-remain-len banks-count)
+            circle       (int (/ other-remain-len banks-count))
             after-concat (concat (range (inc max-pos) banks-count)
                                  (range 0 m))
-            pos-count (group-by identity after-concat)]
+            pos-count    (group-by identity after-concat)]
         (if (> circle 0)
           (map #(do [% (+ circle (count (get pos-count %)))])
                (range 0 banks-count))
@@ -26,21 +26,21 @@
   "The builder to build the process of the reallocation.
    Save the step number and its reallocation result."
   [banks]
-  (let [banks-count (count banks)
+  (let [banks-count   (count banks)
         indexed-banks (vec (map-indexed #(do [%1 %2]) banks))
-        find-max (fn [indexed-banks] (first (sort-by second > indexed-banks)))]
+        find-max      (fn [indexed-banks] (first (sort-by second > indexed-banks)))]
     (iterate (fn [{:keys [step indexed-banks histories] :as recorder}]
                (let [[max-pos max-val] (find-max indexed-banks)
-                     banks (assoc indexed-banks max-pos [max-pos 0])
+                     banks             (assoc indexed-banks max-pos [max-pos 0])
                      reallocate-deltas (reallocation-deltas max-pos max-val banks-count)
-                     new-banks (reduce (fn [b [pos delta]]
-                                         (update b pos (fn [[p v]]
-                                                         [p (+ v delta)])))
-                                       banks reallocate-deltas)]
+                     new-banks         (reduce (fn [b [pos delta]]
+                                                 (update b pos (fn [[p v]]
+                                                                 [p (+ v delta)])))
+                                               banks reallocate-deltas)]
                  (-> (update-in recorder [:histories indexed-banks] (fnil conj []) step)
                      (assoc :step (inc step) :indexed-banks new-banks))))
-             {:histories {}
-              :step      0
+             {:histories     {}
+              :step          0
               :indexed-banks indexed-banks})))
 
 (defn reallocate-steps
@@ -124,6 +124,132 @@
                                       set-self sub-programs)]
               set-subs))
           {} programs))
+
+(defn tower-builder
+  "The builder to build the tower of the programs, from the program."
+  [programs root-program]
+  (if-let [subs-p (:sub-programs root-program)]
+    (assoc root-program :sub-programs
+                        (->> (map #(do [% (tower-builder programs (get programs %))]) subs-p)
+                             (into {})))
+    root-program))
+
+(defn tower-weight
+  "The builder to build the tower of the programs, from the root program.
+   The final tower(return) is like below:
+
+   {:name 'name' ;; the name of this root-program
+    :weight int ;; program-self-weight
+    :sum-weight int ;; the total weight of the tower, whose root is this root-program
+    :sub-programs {'sub-name1' {:name 'sub-name1'
+                                :weight int
+                                :sum-weight int
+                                :sub-programs ...}
+                   'sub-name2' {...}}}"
+  [programs root-program]
+  (if-let [sub-names (:sub-programs root-program)]
+    (let [sub-tower (reduce (fn [r sub-name]
+                              (let [sub-p (tower-weight programs (get programs sub-name))]
+                                (-> (update r :sum-weight + (:sum-weight sub-p))
+                                    (assoc-in [:sub-programs sub-name] sub-p))))
+                            {:sum-weight   (:weight root-program)
+                             :sub-programs {}} sub-names)]
+      (assoc root-program :sub-programs (:sub-programs sub-tower)
+                          :sum-weight (:sum-weight sub-tower)))
+    (assoc root-program :sum-weight (:weight root-program))))
+
+(comment
+  (def tower-example
+    {:name "tknk",
+     :weight 41,
+     :sub-programs {"ugml" {:name "ugml",
+                            :weight 68,
+                            :sub-programs {"gyxo" {:name "gyxo",
+                                                   :weight 61,
+                                                   :sub-programs nil,
+                                                   :sum-weight 61},
+                                           "ebii" {:name "ebii",
+                                                   :weight 61,
+                                                   :sub-programs nil,
+                                                   :sum-weight 61},
+                                           "jptl" {:name "jptl",
+                                                   :weight 61,
+                                                   :sub-programs nil,
+                                                   :sum-weight 61}},
+                            :sum-weight 251},
+                    "padx" {:name "padx",
+                            :weight 45,
+                            :sub-programs {"pbga" {:name "pbga",
+                                                   :weight 66,
+                                                   :sub-programs nil,
+                                                   :sum-weight 66},
+                                           "havc" {:name "havc",
+                                                   :weight 66,
+                                                   :sub-programs nil,
+                                                   :sum-weight 66},
+                                           "qoyq" {:name "qoyq",
+                                                   :weight 66,
+                                                   :sub-programs nil,
+                                                   :sum-weight 66}},
+                            :sum-weight 243},
+                    "fwft" {:name "fwft",
+                            :weight 72,
+                            :sub-programs {"ktlj" {:name "ktlj",
+                                                   :weight 57,
+                                                   :sub-programs nil,
+                                                   :sum-weight 57},
+                                           "cntj" {:name "cntj",
+                                                   :weight 57,
+                                                   :sub-programs nil,
+                                                   :sum-weight 57},
+                                           "xhth" {:name "xhth",
+                                                   :weight 57,
+                                                   :sub-programs nil,
+                                                   :sum-weight 57}},
+                            :sum-weight 243}},
+     :sum-weight 778}))
+
+(defn find-unbalance-program
+  "Finde the unbalance-program，return the name and need-weight."
+  [need-weight {:keys [name sum-weight weight sub-programs] :as tower}]
+  ;; 如果遍历到最后叶子节点（子分支为0），则说明在此分支没有找到这样的结点，返回nil，结束递归
+  ;; 如果各个子分支的总重量相等，则说明不平衡点在本结点自身，返回{:name :need-weight}，结束递归
+  ;; 如果自分支中存在重量不一样的分支，则递归到重量最大的分支
+  (let [sub-programs (vals sub-programs)]
+    (if (= 0 (count sub-programs))
+      nil
+      (if (= 1 (count sub-programs))
+        ;; 只有一个分支，则递归到那个分支
+        (let [sub-p (first sub-programs)]
+          (find-unbalance-program (:sum-weight sub-p) sub-p))
+        (if (= 2 (count sub-programs))
+          ;; 如果有两个分支
+          (if (apply = (mapv :sum-weight sub-programs))
+            ;; 且两个分支的weight相等，那么自身就是不平衡点
+            {:name name :need-weight (+ weight (- need-weight sum-weight))}
+            ;; 如果两个分支不等，那么可能是其中的任意一个不平衡
+            (let [first-result  (find-unbalance-program (:sum-weight (second sub-programs)) (first sub-programs))
+                  second-result (find-unbalance-program (:sum-weight (first sub-programs)) (second sub-programs))]
+              (first (filter identity [first-result second-result]))))
+          ;; 如果两个以上分支
+          (if (apply = (mapv :sum-weight sub-programs))
+            ;; 且各个分支都相等，则自身就是不平衡点
+            {:name name :need-weight (+ weight (- need-weight sum-weight))}
+            ;; 分支中存在不等的，则找出与其他不等的那个
+            (let [w-ps   (group-by :sum-weight sub-programs)
+                  next-p (->> w-ps
+                              (filter #(= 1 (count (last %))))
+                              first
+                              last
+                              first)
+                  need-w (->> w-ps
+                              (filter #(< 1 (count (last %))))
+                              first
+                              last
+                              first
+                              :sum-weight)]
+              (find-unbalance-program need-w next-p))))))))
+
 
 (defn bottom-program
   "---- Day 7: Recursive Circus (Part One)---
@@ -215,11 +341,10 @@
               :sub-programs [\"name1\" \"name2\"]}
     ...}"
   [programs]
-  (let [tower-paths (tower-paths-builder (vals programs))]
-
-
-    )
-  )
+  (let [root-name (bottom-program programs)
+        root-program (get programs root-name)
+        tower     (tower-weight programs root-program)]
+    (find-unbalance-program (:sum-weight tower) tower)))
 
 (comment
   (defn input-converse
@@ -244,6 +369,6 @@
 
   (u/handle-from-file "src/adventofcode/adventofcodeinputs/day7.txt"
                       (input-converse bottom-program))
-  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day7_1.txt"
-                      (input-converse bottom-program))
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day7.txt"
+                      (input-converse weight-for-balance))
   )
