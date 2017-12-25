@@ -171,9 +171,7 @@
                                 (into {}))))]
     (->> (reduce (fn [{:keys [weight-set] :as r} {:keys [name weight sum-weight] :as sub-p}]
                    (if (weight-set sum-weight)
-                     ;; 存在
                      (update r :possible-programs dissoc sum-weight)
-                     ;; 不存在
                      (-> (update r :weight-set conj sum-weight)
                          (assoc-in [:possible-programs sum-weight] sub-p))))
                  {:weight-set        #{}
