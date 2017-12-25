@@ -159,7 +159,7 @@
     (assoc root-program :sum-weight (:weight root-program))))
 
 (defn possible-programs
-  "Find the possible unbalance programs form the sub-programs"
+  "Find the possible unbalance programs from the sub-programs"
   [sub-programs]
   (let [convert-need-w (fn [{:keys [weight-set possible-programs] :as result}]
                          (if (= (count weight-set) 1)
