@@ -141,114 +141,66 @@
    {:name 'name' ;; the name of this root-program
     :weight int ;; program-self-weight
     :sum-weight int ;; the total weight of the tower, whose root is this root-program
-    :sub-programs {'sub-name1' {:name 'sub-name1'
-                                :weight int
-                                :sum-weight int
-                                :sub-programs ...}
-                   'sub-name2' {...}}}"
+    :sub-programs [{:name 'sub-name1'
+                    :weight int
+                    :sum-weight int
+                    :sub-programs ...}
+                   {...}}}"
   [programs root-program]
   (if-let [sub-names (:sub-programs root-program)]
     (let [sub-tower (reduce (fn [r sub-name]
                               (let [sub-p (tower-weight programs (get programs sub-name))]
                                 (-> (update r :sum-weight + (:sum-weight sub-p))
-                                    (assoc-in [:sub-programs sub-name] sub-p))))
+                                    (update :sub-programs conj sub-p))))
                             {:sum-weight   (:weight root-program)
-                             :sub-programs {}} sub-names)]
+                             :sub-programs []} sub-names)]
       (assoc root-program :sub-programs (:sub-programs sub-tower)
                           :sum-weight (:sum-weight sub-tower)))
     (assoc root-program :sum-weight (:weight root-program))))
 
+(defn possible-programs
+  "Find the possible unbalance programs form the sub-programs"
+  [sub-programs]
+  (let [convert-need-w (fn [{:keys [weight-set possible-programs] :as result}]
+                         (if (= (count weight-set) 1)
+                           possible-programs
+                           (->> (map (fn [[w p]]
+                                       (let [another-w (first (disj weight-set w))]
+                                         [another-w p]))
+                                     possible-programs)
+                                (into {}))))]
+    (->> (reduce (fn [{:keys [weight-set] :as r} {:keys [name weight sum-weight] :as sub-p}]
+                   (if (weight-set sum-weight)
+                     ;; 存在
+                     (update r :possible-programs dissoc sum-weight)
+                     ;; 不存在
+                     (-> (update r :weight-set conj sum-weight)
+                         (assoc-in [:possible-programs sum-weight] sub-p))))
+                 {:weight-set        #{}
+                  :possible-programs {}} sub-programs)
+         convert-need-w)))
+
 (comment
-  (def tower-example
-    {:name "tknk",
-     :weight 41,
-     :sub-programs {"ugml" {:name "ugml",
-                            :weight 68,
-                            :sub-programs {"gyxo" {:name "gyxo",
-                                                   :weight 61,
-                                                   :sub-programs nil,
-                                                   :sum-weight 61},
-                                           "ebii" {:name "ebii",
-                                                   :weight 61,
-                                                   :sub-programs nil,
-                                                   :sum-weight 61},
-                                           "jptl" {:name "jptl",
-                                                   :weight 61,
-                                                   :sub-programs nil,
-                                                   :sum-weight 61}},
-                            :sum-weight 251},
-                    "padx" {:name "padx",
-                            :weight 45,
-                            :sub-programs {"pbga" {:name "pbga",
-                                                   :weight 66,
-                                                   :sub-programs nil,
-                                                   :sum-weight 66},
-                                           "havc" {:name "havc",
-                                                   :weight 66,
-                                                   :sub-programs nil,
-                                                   :sum-weight 66},
-                                           "qoyq" {:name "qoyq",
-                                                   :weight 66,
-                                                   :sub-programs nil,
-                                                   :sum-weight 66}},
-                            :sum-weight 243},
-                    "fwft" {:name "fwft",
-                            :weight 72,
-                            :sub-programs {"ktlj" {:name "ktlj",
-                                                   :weight 57,
-                                                   :sub-programs nil,
-                                                   :sum-weight 57},
-                                           "cntj" {:name "cntj",
-                                                   :weight 57,
-                                                   :sub-programs nil,
-                                                   :sum-weight 57},
-                                           "xhth" {:name "xhth",
-                                                   :weight 57,
-                                                   :sub-programs nil,
-                                                   :sum-weight 57}},
-                            :sum-weight 243}},
-     :sum-weight 778}))
+  (possible-programs [{:sum-weight 1 :name :1}]) ;;=> {1 {:sum-weight 1 :name :1}}
+  (possible-programs [{:sum-weight 1 :name :1} {:sum-weight 1 :name :2}]) ;;=> {}
+  (possible-programs [{:sum-weight 1 :name :1} {:sum-weight 2 :name :2}])
+  ;;=> {2 {:sum-weight 1 :name :1} 1 {:sum-weight 2 :name :2}}
+  (possible-programs [{:sum-weight 1 :name :1} {:sum-weight 1 :name :2} {:sum-weight 2 :name :3}])
+  ;;=> {1 {:sum-weight 2 :name :3}}
+  (possible-programs nil) ;;=> {}
+  )
 
 (defn find-unbalance-program
   "Finde the unbalance-program，return the name and need-weight."
   [need-weight {:keys [name sum-weight weight sub-programs] :as tower}]
-  ;; 如果遍历到最后叶子节点（子分支为0），则说明在此分支没有找到这样的结点，返回nil，结束递归
-  ;; 如果各个子分支的总重量相等，则说明不平衡点在本结点自身，返回{:name :need-weight}，结束递归
-  ;; 如果自分支中存在重量不一样的分支，则递归到重量最大的分支
-  (let [sub-programs (vals sub-programs)]
-    (if (= 0 (count sub-programs))
-      nil
-      (if (= 1 (count sub-programs))
-        ;; 只有一个分支，则递归到那个分支
-        (let [sub-p (first sub-programs)]
-          (find-unbalance-program (:sum-weight sub-p) sub-p))
-        (if (= 2 (count sub-programs))
-          ;; 如果有两个分支
-          (if (apply = (mapv :sum-weight sub-programs))
-            ;; 且两个分支的weight相等，那么自身就是不平衡点
-            {:name name :need-weight (+ weight (- need-weight sum-weight))}
-            ;; 如果两个分支不等，那么可能是其中的任意一个不平衡
-            (let [first-result  (find-unbalance-program (:sum-weight (second sub-programs)) (first sub-programs))
-                  second-result (find-unbalance-program (:sum-weight (first sub-programs)) (second sub-programs))]
-              (first (filter identity [first-result second-result]))))
-          ;; 如果两个以上分支
-          (if (apply = (mapv :sum-weight sub-programs))
-            ;; 且各个分支都相等，则自身就是不平衡点
-            {:name name :need-weight (+ weight (- need-weight sum-weight))}
-            ;; 分支中存在不等的，则找出与其他不等的那个
-            (let [w-ps   (group-by :sum-weight sub-programs)
-                  next-p (->> w-ps
-                              (filter #(= 1 (count (last %))))
-                              first
-                              last
-                              first)
-                  need-w (->> w-ps
-                              (filter #(< 1 (count (last %))))
-                              first
-                              last
-                              first
-                              :sum-weight)]
-              (find-unbalance-program need-w next-p))))))))
+  (when (not= 0 (count sub-programs))
+    (let [ps (possible-programs sub-programs)]
+      (if (empty? ps)
+        {:name name :need-weight (+ weight (- need-weight sum-weight))}
+        (->> ps
+             (mapv #(apply find-unbalance-program %))
+             (filter identity)
+             first)))))
 
 
 (defn bottom-program
