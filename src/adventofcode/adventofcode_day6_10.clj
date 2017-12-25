@@ -339,6 +339,22 @@
                    (ops-fn reg amount)
                    reg))}))
 
+(defn registers-builder
+  "The builder to build the whole registers, according to the instructions.
+   With the highest value, held in any registers."
+  [instructions]
+  (reduce (fn [{:keys [highest registers] :as all-registers} instruction]
+            (let [{:keys [register amount cond-arg handler]} (parse-instruction instruction)
+                  reg-val (get registers register 0)
+                  new-val (handler reg-val
+                                   (or amount 0)
+                                   (get registers cond-arg 0))]
+              (-> (assoc-in all-registers [:registers register] new-val)
+                  (#(if (> new-val highest)
+                      (assoc % :highest new-val)
+                      %)))))
+          {:highest 0 :registers {}} instructions))
+
 (defn largest-register
   "--- Day 8: I Heard You Like Registers (Part One)---
    Each instruction consists of several parts: the register to modify, whether
@@ -363,16 +379,28 @@
    in your puzzle input?
    ------------------------------------------------"
   [instructions]
-  (let [registers (reduce (fn [all-registers instruction]
-                            (let [{:keys [register amount cond-arg handler]} (parse-instruction instruction)
-                                  reg-val (get all-registers register 0)]
-                              (assoc all-registers register (handler reg-val
-                                                                     (or amount 0)
-                                                                     (get all-registers cond-arg 0)))))
-                          {} instructions)
-        sorted-registers (sort-by last >= (into [] registers))]
-    (last (first sorted-registers))))
+  (->> (registers-builder instructions)
+       :registers
+       (into [])
+       (sort-by last >=)
+       first
+       last))
 
 (comment
   (u/handle-from-file "src/adventofcode/adventofcodeinputs/day8_example.txt" largest-register)
   (u/handle-from-file "src/adventofcode/adventofcodeinputs/day8.txt" largest-register))
+
+(defn highest-value
+  "---Day 8: I Heard You Like Registers (Part Two) ---
+   To be safe, the CPU also needs to know the highest value held in any register
+   during this process so that it can decide how much memory to allocate to these
+   operations. For example, in the above instructions, the highest value ever
+   held was 10 (in register c after the third instruction was evaluated).
+   ----------------------------------"
+  [instructions]
+  (:highest (registers-builder instructions)))
+
+(comment
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day8_example.txt" highest-value)
+  (u/handle-from-file "src/adventofcode/adventofcodeinputs/day8.txt" highest-value)
+  )
