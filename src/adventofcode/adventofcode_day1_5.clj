@@ -5,9 +5,9 @@
 (defn captcha-sum-by-step
   "Calculate the sum of the digits, which if the digit `step` steps forward matches it."
   [captcha step]
-  (let [captcha-seq      (vec (seq captcha))
+  (let [captcha-seq (vec (seq captcha))
         captcha-len (count captcha-seq)
-        match-pos (fn [start] (mod (+ start step) captcha-len))]
+        match-pos   (fn [start] (mod (+ start step) captcha-len))]
     (reduce (fn [sum pos]
               (if (= (get captcha-seq pos)
                      (get captcha-seq (mod (+ pos step) captcha-len)))

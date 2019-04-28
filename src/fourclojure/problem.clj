@@ -122,7 +122,10 @@
     (map fibonacci ir)))
 
 ;; 最优美的实现：
+
 (defn fibonacci-sequence
+  "求斐波那契数列：
+  F(1)=F(2)=1,F(n)=F(n-1)+F(n-2) (n≥3)"
   [n]
   (->> (iterate (fn [[a b]] [b (+' a b)]) [1 1])
        (map first)
@@ -497,3 +500,38 @@
   (lazy-seq
     (when-let [s (seq coll)]
       (cons (f (first s)) (my-map f (rest s))))))
+
+(defn xconj
+  "实现一个conj函数，构建一颗二叉树"
+  [t v]
+  (cond
+    (nil? t) {:val v :L nil :R nil}
+    (< v (:val t)) {:val (:val t)
+                    :L (xconj (:L t) v)
+                    :R (:R t)}
+    :else
+    {:val (:val t)
+     :L (:L t)
+     :R (xconj (:R t) v)}))
+
+(defn perm
+  "排列——递归实现
+  ;; start: 排列起始位置
+  ;; num：指定的元素个数
+  ;; handler：对每个排列元素的处理函数"
+  ([item-list start num handler]
+   (if (= start num)
+     (handler (take num item-list))
+     (doseq [i (range start (count item-list))]
+       (-> (assoc item-list start (nth item-list i)
+                            i (nth item-list start)) ;; 交换元素
+           (perm (inc start) num handler)))))
+  ([item-list num]
+    ;; 指定元素个数的排列
+   (let [results (atom [])
+         add-result #(swap! results conj %)]
+     (perm item-list 0 num add-result)
+     @results))
+  ([item-list]
+    ;; 全排列
+   (perm item-list (count item-list))))
